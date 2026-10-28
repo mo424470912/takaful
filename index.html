@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>تكافل – نظام لجنة الإغاثة</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<style>
+:root{--ink:#12302b;--bg:#f2f5f4;--card:#fff;--line:#d3dcd9;--mut:#5d716c;--acc:#c9892b;--acc2:#12302b;--bad:#b3402f;--ok:#2f7d4f;--soft:#e4efec;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root[data-theme="dark"]{--ink:#e6efec;--bg:#0f1b19;--card:#172724;--line:#2a3f3b;--mut:#98ada8;--acc:#e0a248;--acc2:#2f7d6b;--soft:#1f3532}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#e6efec;--bg:#0f1b19;--card:#172724;--line:#2a3f3b;--mut:#98ada8;--acc:#e0a248;--acc2:#2f7d6b;--soft:#1f3532}}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:Tajawal,Tahoma,sans-serif;font-size:15px;line-height:1.6}
+header{background:var(--acc2);color:#fff;padding:12px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+header h1{font-size:19px;margin:0;font-weight:800}
+select,input,button,textarea{font:inherit;color:inherit}
+select,input,textarea{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:7px 10px;min-width:0}
+nav{display:flex;gap:4px;padding:10px 12px 0;overflow-x:auto;border-bottom:1px solid var(--line);background:var(--card)}
+nav button{background:none;border:0;padding:10px 14px;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap;font-weight:500;color:var(--mut)}
+nav button.on{border-color:var(--acc);color:var(--ink);font-weight:800}
+nav b{background:var(--bad);color:#fff;border-radius:10px;padding:0 7px;font-size:12px;margin-inline-start:4px}
+main{max-width:1000px;margin:0 auto;padding:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:14px}
+.card h2{font-size:16px;margin:0 0 10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px}
+.kpi span{color:var(--mut);font-size:13px}.kpi div{font-size:30px;font-weight:800;line-height:1.2}
+.kpi.big{background:var(--acc2);color:#fff;border:0}.kpi.big span{color:#ffffffbb}
+.bar{display:grid;grid-template-columns:110px 1fr 44px;gap:8px;align-items:center;margin:6px 0}
+.bar i{display:block;height:12px;border-radius:6px;background:var(--acc)}.bar u{background:var(--soft);border-radius:6px;display:block}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:center}
+.btn{background:var(--acc2);color:#fff;border:0;border-radius:8px;padding:8px 14px;cursor:pointer;font-weight:500}
+.btn.alt{background:var(--soft);color:var(--ink)}.btn.gold{background:var(--acc);color:#1b1304}.btn.red{background:var(--bad)}.btn.s{padding:3px 10px;font-size:13px}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:14px}
+th{background:var(--soft);text-align:right;padding:8px;white-space:nowrap}td{padding:7px 8px;border-bottom:1px solid var(--line)}
+.tag{background:var(--soft);border-radius:6px;padding:1px 8px;font-size:12px;white-space:nowrap}.tag.ok{background:var(--ok);color:#fff}.tag.no{background:var(--bad);color:#fff}.tag.w{background:var(--acc);color:#1b1304}
+.log{border-inline-start:4px solid var(--line);padding:6px 12px;margin:8px 0}.log.new{border-color:var(--acc);background:var(--soft)}.log small{color:var(--mut)}
+.empty{text-align:center;color:var(--mut);padding:26px 10px}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);width:min(460px,94vw);padding:16px}dialog::backdrop{background:#0008}
+.f{display:grid;grid-template-columns:1fr 1fr;gap:10px}.f label{display:grid;gap:3px;font-size:13px;color:var(--mut)}.f .w{grid-column:1/-1}
+#toast{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:8px;display:none;z-index:9;max-width:90vw}
+a.sms{color:var(--ok);font-weight:700;text-decoration:none}
+.login{max-width:380px;margin:30px auto}
+@media(max-width:520px){.bar{grid-template-columns:80px 1fr 36px}.f{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><h1>تكافل</h1><div id="hd" class="tools" style="margin:0"></div></header>
+<nav id="nav"></nav><main id="main"><div class="empty">جاري التحميل…</div></main>
+<dialog id="dlg"></dialog><input type="file" id="file" accept=".xlsx,.xls,.csv" hidden><div id="toast"></div>
+<script>
+// الصق هنا إعدادات مشروع Firebase (Project settings > Your apps)
+const FIREBASE_CONFIG={apiKey:'',authDomain:'',projectId:'',storageBucket:'',messagingSenderId:'',appId:''};
+const $=s=>document.querySelector(s),esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),today=()=>new Date().toISOString().slice(0,10);
+const RN={manager:'مدير',admin:'إداري',member:'عضو'},ST=['محتاج','أرمل/ة','أيتام','مريض','كبير سن','عادي'],PR=['عالية','متوسطة','عادية'],AT=['كابونة','طرد غذائي','مساعدة نقدية','بطانيات','أخرى'],RT={add:'إضافة',edit:'تعديل',del:'حذف',imp:'استيراد'};
+const MN=['الأول','الثاني','الثالث','الرابع','الخامس','السادس'];
+let DB,ME=null,D={pp:[],ac:[],rq:[],ai:[],ev:[]},rdy={},tab='stats',fm='all',fa='all',q='',ex=new Set(),SR={};
+let CF={mosques:MN.map((n,i)=>({id:'m'+(i+1),name:'المسجد '+n})),sms:'السلام عليكم {الاسم}، تم ترشيحكم لاستلام مساعدة من لجنة الإغاثة. نرجو مراجعة المسجد.'};
+const mname=id=>(CF.mosques.find(m=>m.id===id)||{name:'—'}).name,isM=()=>ME.role==='manager',all=()=>ME.role!=='member';
+const toast=t=>{const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>e.style.display='none',2800)};
+const set=(c,o)=>DB.doc(c+'/'+o.id).set(o).catch(()=>toast('تعذر الحفظ')),del=(c,id)=>DB.doc(c+'/'+id).delete().catch(()=>toast('تعذر الحذف'));
+const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+const ev=t=>set('ev',{id:uid('e'),t:Date.now(),txt:t,by:ME.name,seen:false});
+const sec=()=>firebase.initializeApp(FIREBASE_CONFIG,'s'+Date.now()),fin=a=>{a.auth().signOut().catch(()=>{});a.delete().catch(()=>{})};
+async function mkAcct(o){const a=sec();try{await a.auth().createUserWithEmailAndPassword(o.u+'@relief.app',o.pw);await set('ac',{id:o.u,u:o.u,name:o.name,phone:o.phone,role:o.role,m:o.m||'',t:Date.now()})}finally{fin(a)}}
+async function boot(o){const a=sec();try{await a.auth().createUserWithEmailAndPassword(o.u+'@relief.app',o.pw);const f=a.firestore(),b=f.batch();b.set(f.doc('ac/'+o.u),{id:o.u,u:o.u,name:o.name,phone:o.phone,role:'manager',m:'',t:Date.now()});b.set(f.doc('cf/boot'),{id:'boot',t:Date.now()});await b.commit()}finally{fin(a)}}
+const dl=(n,b)=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=n;a.click()};
+const mopts=(v,a)=>(a?'<option value="all">كل المساجد</option>':'')+CF.mosques.map(m=>`<option value="${m.id}" ${v===m.id?'selected':''}>${esc(m.name)}</option>`).join('');
+const vis=()=>D.pp.filter(p=>all()?(fm==='all'||p.m===fm):p.m===ME.m);
+const rd=()=>{if(document.querySelector('dialog[open]')||/INPUT|TEXTAREA|SELECT/.test((document.activeElement||{}).tagName||''))return;draw()};
+function mbar(){return all()?`<select id="fm">${mopts(fm,1)}</select>`:`<span class="tag">${esc(mname(ME.m))}</span>`}
+function bfm(){const e=$('#fm');if(e)e.onchange=()=>{fm=e.value;draw()}}
+function draw(){
+ if(!ME||!(rdy.ac&&rdy.cf))return;
+ $('#hd').innerHTML=ME?`<span>${esc(ME.name)} · ${RN[ME.role]}${ME.role==='member'?' · '+esc(mname(ME.m)):''}</span><button class="btn alt s" id="pw">كلمة المرور</button><button class="btn alt s" id="lo">خروج</button>`:'';
+ if(!ME)return login();
+ $('#pw').onclick=pwDlg;$('#lo').onclick=()=>AU.signOut();
+ const pe=D.rq.filter(r=>r.st==='pending').length,ue=D.ev.filter(e=>!e.seen).length,b=n=>n?`<b>${n}</b>`:'';
+ const T=[['stats','الإحصائيات'],['people','السكان'],['nom','الترشيح والاستلام'],['aid','المستفيدون'],['req','طلبات الاعتماد'+(isM()?b(pe):'')]];
+ if(all())T.push(['usr','الحسابات']);if(isM())T.push(['ev','الإشعارات'+b(ue)],['set','الإعدادات']);
+ if(!T.find(t=>t[0]===tab))tab='stats';
+ $('#nav').innerHTML=T.map(t=>`<button class="${tab===t[0]?'on':''}" data-t="${t[0]}">${t[1]}</button>`).join('');
+ document.querySelectorAll('#nav button').forEach(x=>x.onclick=()=>{tab=x.dataset.t;draw()});
+ ({stats:vStats,people:vPeople,nom:vNom,aid:vAid,req:vReq,usr:vUsr,ev:vEv,set:vSet})[tab]();
+}
+function login(){
+ $('#main').innerHTML=`<div class="card login"><h2>تسجيل الدخول</h2><div class="f"><label class="w">اسم المستخدم<input id="l_u" dir="ltr"></label><label class="w">كلمة المرور<input id="l_p" type="password"></label></div><div class="tools" style="margin-top:12px"><button class="btn" id="l_ok">دخول</button><button class="btn alt s" id="l_s">أول تشغيل؟ إنشاء المدير</button></div></div>`;
+ const go=async()=>{try{await AU.signInWithEmailAndPassword($('#l_u').value.trim().toLowerCase()+'@relief.app',$('#l_p').value)}catch(e){toast('بيانات الدخول غير صحيحة')}};
+ $('#l_ok').onclick=go;$('#l_p').onkeydown=e=>{if(e.key==='Enter')go()};$('#l_s').onclick=setup}
+function setup(){const d=$('#dlg');d.innerHTML=`<h2 style="margin-top:0">إنشاء حساب المدير (مرة واحدة)</h2><div class="f"><label class="w">الاسم<input id="a_n"></label><label>اسم المستخدم (إنجليزي)<input id="a_u" dir="ltr"></label><label>كلمة المرور (6+)<input id="a_p" type="password"></label><label class="w">الجوال<input id="a_t"></label></div><div class="tools" style="margin:14px 0 0"><button class="btn" id="ok">إنشاء</button><button class="btn alt" id="no">إلغاء</button></div>`;d.showModal();$('#no').onclick=()=>d.close();
+ $('#ok').onclick=async()=>{const u=$('#a_u').value.trim().toLowerCase(),p=$('#a_p').value,n=$('#a_n').value.trim();if(!/^[a-z0-9_.-]{3,}$/.test(u)||p.length<6||!n)return toast('أكمل البيانات (كلمة المرور 6 أحرف على الأقل)');
+  try{await boot({u,pw:p,name:n,phone:$('#a_t').value.trim()});d.close();toast('تم. سجّل الدخول الآن')}catch(e){toast(e.code==='auth/email-already-in-use'?'اسم المستخدم مستخدم':'تمت التهيئة مسبقاً أو حدث خطأ')}}}
+function pwDlg(){const d=$('#dlg');d.innerHTML=`<h2 style="margin-top:0">تغيير كلمة المرور</h2><div class="f"><label class="w">الحالية<input id="o" type="password"></label><label class="w">الجديدة (6+)<input id="n" type="password"></label></div><div class="tools" style="margin:14px 0 0"><button class="btn" id="ok">حفظ</button><button class="btn alt" id="no">إلغاء</button></div>`;d.showModal();$('#no').onclick=()=>d.close();
+ $('#ok').onclick=async()=>{const n=$('#n').value;if(n.length<6)return toast('6 أحرف على الأقل');try{const u=AU.currentUser;await u.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(u.email,$('#o').value));await u.updatePassword(n);ev('قام بتغيير كلمة المرور الخاصة به');d.close();toast('تم التغيير')}catch(e){toast('كلمة المرور الحالية خطأ')}}}
+const bars=(o,mx)=>Object.entries(o).map(([k,v])=>`<div class="bar"><span>${esc(k)}</span><u><i style="width:${mx?Math.round(v/mx*100):0}%"></i></u><b>${v}</b></div>`).join('')||'<div class="empty">لا توجد بيانات</div>';
+function vStats(){
+ const P=vis(),ind=P.reduce((a,p)=>a+(+p.fam||0),0),got=P.filter(p=>p.last).length,byS={},byA={};
+ P.forEach(p=>byS[p.status]=(byS[p.status]||0)+1);D.ai.filter(a=>all()?(fm==='all'||a.m===fm):a.m===ME.m).forEach(a=>byA[a.type]=(byA[a.type]||0)+1);
+ const M=CF.mosques.filter(m=>all()?true:m.id===ME.m),mx=o=>Math.max(1,...Object.values(o));
+ const rows=M.map(m=>{const x=D.pp.filter(p=>p.m===m.id);return{'المسجد':m.name,'الأسر':x.length,'الأفراد':x.reduce((a,p)=>a+(+p.fam||0),0),'مرشحون':x.filter(p=>p.nom).length,'استلموا':x.filter(p=>p.last).length}});
+ $('#main').innerHTML=`<div class="tools">${mbar()}<button class="btn alt" id="xr">تصدير تقرير Excel</button></div><div class="grid"><div class="kpi big"><span>عدد الأسر</span><div>${P.length}</div></div><div class="kpi"><span>الأفراد</span><div>${ind}</div></div><div class="kpi"><span>مرشحون حالياً</span><div>${P.filter(p=>p.nom).length}</div></div><div class="kpi"><span>استلموا</span><div>${got}</div></div></div>
+ <div class="card tw"><h2>حسب المسجد</h2><table><tr>${Object.keys(rows[0]||{}).map(k=>`<th>${k}</th>`).join('')}</tr>${rows.map(r=>'<tr>'+Object.values(r).map(v=>`<td>${esc(v)}</td>`).join('')+'</tr>').join('')}</table></div>
+ <div class="card"><h2>حسب الحالة</h2>${bars(byS,mx(byS))}</div><div class="card"><h2>حسب نوع الاستفادة</h2>${bars(byA,mx(byA))}</div>`;
+ bfm();$('#xr').onclick=()=>xl(rows,'تقرير-إحصائي-'+today()+'.xlsx')}
+const rowOut=p=>({'رقم الهوية':p.idno,'الاسم رباعي':p.name,'عدد الأفراد':p.fam,'رقم الجوال':p.phone,'المسجد':mname(p.m),'الحالة الاجتماعية':p.marital||'','رقم هوية الزوجة':p.wid||'','اسم الزوجة رباعي':p.wname||'','الحالة':p.status,'الأولوية':p.prio,'ملاحظات':p.note||'','آخر استلام':p.last||'','نوع آخر استفادة':p.lt||''});
+function vPeople(){
+ const L=vis().filter(p=>!q||[p.name,p.idno,p.phone].join(' ').includes(q)).sort((a,b)=>PR.indexOf(a.prio)-PR.indexOf(b.prio));
+ $('#main').innerHTML=`<div class="tools">${mbar()}<input id="q" placeholder="بحث" value="${esc(q)}" style="flex:1;min-width:140px"><button class="btn" id="add">+ ${isM()?'إضافة':'طلب إضافة'}</button><button class="btn alt" id="imp">استيراد</button><button class="btn alt" id="exp">تصدير</button><button class="btn alt" id="tpl">نموذج</button></div>
+ <div class="card tw">${L.length?`<table><tr><th>مرشّح</th><th>الاسم</th>${all()?'<th>المسجد</th>':''}<th>الجوال</th><th>الأفراد</th><th>الحالة</th><th>الأولوية</th><th>آخر استلام</th><th></th></tr>`+L.map(p=>`<tr><td><input type="checkbox" data-n="${p.id}" ${p.nom?'checked':''}></td><td>${esc(p.name)}</td>${all()?`<td>${esc(mname(p.m))}</td>`:''}<td>${esc(p.phone)}</td><td>${esc(p.fam)}</td><td><span class="tag">${esc(p.status)}</span></td><td><select data-p="${p.id}">${PR.map(x=>`<option ${x===p.prio?'selected':''}>${x}</option>`).join('')}</select></td><td>${esc(p.last||'—')}</td><td><button class="btn alt s" data-e="${p.id}">${isM()?'تعديل':'طلب تعديل'}</button> <button class="btn red s" data-d="${p.id}">${isM()?'حذف':'طلب حذف'}</button></td></tr>`).join('')+'</table>':'<div class="empty">لا توجد أسر</div>'}</div>`;
+ bfm();$('#q').oninput=e=>{q=e.target.value;vPeople();const i=$('#q');i.focus();i.setSelectionRange(q.length,q.length)};
+ const fp=id=>D.pp.find(x=>x.id===id);
+ document.querySelectorAll('[data-n]').forEach(c=>c.onchange=()=>{const p=fp(c.dataset.n);set('pp',{...p,nom:c.checked});ev((c.checked?'ترشيح ':'إلغاء ترشيح ')+p.name+' – '+mname(p.m))});
+ document.querySelectorAll('[data-p]').forEach(s=>s.onchange=()=>{const p=fp(s.dataset.p);set('pp',{...p,prio:s.value});ev('أولوية '+p.name+' ← '+s.value)});
+ $('#add').onclick=()=>pdlg();document.querySelectorAll('[data-e]').forEach(b=>b.onclick=()=>pdlg(b.dataset.e));
+ document.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{const p=fp(b.dataset.d);if(!confirm((isM()?'حذف ':'إرسال طلب حذف ')+p.name+'؟'))return;
+  if(isM()){del('pp',p.id);ev('حذف '+p.name+' – '+mname(p.m))}else sendReq('del',p.m,{pid:p.id,pname:p.name})});
+ $('#imp').onclick=()=>$('#file').click();
+ $('#exp').onclick=()=>xl(L.map(rowOut),'سكان-'+today()+'.xlsx');
+ $('#tpl').onclick=()=>xl([Object.fromEntries(Object.keys(rowOut({})).slice(0,8).map(k=>[k,'']))],'نموذج-استيراد.xlsx')}
+function sendReq(type,m,x){set('rq',{id:uid('r'),type,m,by:ME.u,byName:ME.name,t:Date.now(),st:'pending',...x});ev('طلب '+RT[type]+' جديد – '+mname(m)+(x.pname?': '+x.pname:''));toast('أُرسل الطلب للمدير')}
+function pdlg(id){
+ const p=id?D.pp.find(x=>x.id===id):{id:uid('p'),m:all()?(fm==='all'?CF.mosques[0].id:fm):ME.m,name:'',idno:'',phone:'',fam:1,status:'محتاج',prio:'عادية',note:'',nom:false,last:''},d=$('#dlg');
+ d.innerHTML=`<h2 style="margin-top:0">${id?'تعديل':'إضافة'} أسرة</h2><div class="f"><label class="w">الاسم<input id="f_name" value="${esc(p.name)}"></label><label>الهوية<input id="f_idno" value="${esc(p.idno)}"></label><label>الجوال<input id="f_phone" value="${esc(p.phone)}"></label><label>الأفراد<input id="f_fam" type="number" min="1" value="${esc(p.fam)}"></label><label>حالة الاحتياج<select id="f_status">${ST.map(s=>`<option ${s===p.status?'selected':''}>${s}</option>`).join('')}</select></label>${all()?`<label>المسجد<select id="f_m">${mopts(p.m)}</select></label>`:''}<label>الحالة الاجتماعية<select id="f_marital">${['','متزوج','أرمل/ة','مطلق/ة','أعزب'].map(s=>`<option ${s===p.marital?'selected':''}>${s}</option>`).join('')}</select></label><label>رقم هوية الزوجة<input id="f_wid" value="${esc(p.wid)}"></label><label class="w">اسم الزوجة رباعي<input id="f_wname" value="${esc(p.wname)}"></label><label class="w">ملاحظات<input id="f_note" value="${esc(p.note)}"></label></div><div class="tools" style="margin:14px 0 0"><button class="btn" id="ok">${isM()?'حفظ':'إرسال للاعتماد'}</button><button class="btn alt" id="no">إلغاء</button></div>`;
+ d.showModal();$('#no').onclick=()=>d.close();
+ $('#ok').onclick=()=>{const g=k=>$('#f_'+k).value.trim();if(!g('name'))return toast('الاسم مطلوب');const n={...p,name:g('name'),idno:g('idno'),phone:g('phone'),fam:+g('fam')||1,status:g('status'),note:g('note'),marital:g('marital'),wid:g('wid'),wname:g('wname'),m:all()?g('m'):p.m};
+  if(isM()){set('pp',n);ev((id?'تعديل ':'إضافة ')+n.name+' – '+mname(n.m))}else sendReq(id?'edit':'add',n.m,{data:n,pname:n.name});d.close()}}
+$('#file').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const dm=all()?(fm==='all'?'':fm):ME.m,r=new FileReader();
+ r.onload=()=>{try{const wb=XLSX.read(r.result,{type:'array'}),rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});let n=0;const out=[];
+  let sk=0;rows.forEach(x=>{const g=(...k)=>String(k.map(i=>x[i]).find(v=>v!=null&&v!=='')??'').trim(),name=g('الاسم رباعي','الاسم');if(!name)return;const mv=g('المسجد'),mid=all()?((CF.mosques.find(k=>k.name===mv||(mv&&(k.name.includes(mv)||mv.includes(k.name))))||{}).id||dm):dm;if(!mid){sk++;return}
+  out.push({id:uid('p')+n++,m:mid,name,idno:g('رقم الهوية'),phone:g('رقم الجوال','الجوال'),fam:+g('عدد الأفراد','أفراد الأسرة')||1,marital:g('الحالة الاجتماعية'),wid:g('رقم هوية الزوجة'),wname:g('اسم الزوجة رباعي','اسم الزوجة'),status:ST.includes(x['الحالة'])?x['الحالة']:'محتاج',prio:PR.includes(x['الأولوية'])?x['الأولوية']:'عادية',note:g('ملاحظات'),nom:false,last:''})});
+  if(!out.length)return toast('لا توجد أسماء صالحة، تأكد من عمود المسجد');if(sk)toast('تم تجاوز '+sk+' صف بدون مسجد معروف');
+  if(isM()){out.forEach(p=>set('pp',p));ev('استيراد '+out.length+' أسرة')}else sendReq('imp',out[0].m,{rows:out,pname:out.length+' أسرة'})}catch(err){toast('تعذر قراءة الملف')}};r.readAsArrayBuffer(f)};
+async function xl(rows,name){try{const ws=XLSX.utils.json_to_sheet(rows),wb=XLSX.utils.book_new();wb.Workbook={Views:[{RTL:true}]};XLSX.utils.book_append_sheet(wb,ws,'البيانات');
+ const out=XLSX.write(wb,{type:'array',bookType:'xlsx'});dl(name,new Blob([out]))}catch(e){toast('تعذر التصدير')}}
+function smsBox(k,title,rec,tpl){SR[k]=rec;return `<div class="card"><h2>${title} (${rec.length})</h2><textarea data-k="${k}" rows="2" style="width:100%">${esc(tpl)}</textarea><div class="tools" style="margin-top:8px"><button class="btn alt s" data-cp="${k}">نسخ الأرقام</button><button class="btn alt s" data-csv="${k}">ملف للإرسال الجماعي</button></div><div class="tw"><table>${rec.map((r,i)=>`<tr><td>${esc(r['الاسم'])}</td><td>${esc(r.phone)}</td><td><a class="sms" href="#" data-k="${k}" data-i="${i}">إرسال</a></td></tr>`).join('')}</table></div></div>`}
+const smsMsg=(k,r)=>$(`textarea[data-k="${k}"]`).value.replace(/\{(.+?)\}/g,(_,x)=>r[x]!=null?r[x]:'');
+document.addEventListener('click',async e=>{const a=e.target.closest('a.sms,[data-cp],[data-csv]');if(!a)return;e.preventDefault();
+ if(a.matches('a.sms')){const r=SR[a.dataset.k][+a.dataset.i];window.open('sms:'+r.phone+'?body='+encodeURIComponent(smsMsg(a.dataset.k,r)),'_top')}
+ else if(a.dataset.cp){try{await navigator.clipboard.writeText(SR[a.dataset.cp].map(r=>r.phone).join('\n'));toast('تم النسخ')}catch(x){toast('تعذر النسخ')}}
+ else{try{const k=a.dataset.csv;dl('sms-'+today()+'.csv',new Blob(['\ufeffphone,message\n'+SR[k].map(r=>`"${r.phone}","${smsMsg(k,r).replace(/"/g,'""')}"`).join('\n')],{type:'text/csv'}))}catch(x){}}});
+function vNom(){
+ const nl=vis().filter(p=>p.nom).sort((a,b)=>PR.indexOf(a.prio)-PR.indexOf(b.prio)||(+b.fam||0)-(+a.fam||0)),S2=nl.filter(p=>!ex.has(p.id));
+ const ms=[...new Set(S2.map(p=>p.m))],mem=D.ac.filter(a=>a.phone&&(a.role!=='member'||ms.includes(a.m)));
+ $('#main').innerHTML=`<div class="tools">${mbar()}<label>ترشيح تلقائي لأعلى <input id="an" type="number" min="1" value="10" style="width:70px"></label><button class="btn gold" id="auto">اقتراح</button></div>
+ <div class="card"><div class="tools"><b>المرشحون: ${S2.length} من ${nl.length}</b><select id="at">${AT.map(x=>`<option>${x}</option>`).join('')}</select><button class="btn" id="rec">تسجيل الاستلام للمحددين</button><button class="btn alt" id="x1">تصدير ملف الترشيح</button></div>
+ ${nl.length?`<div class="tw"><table><tr><th></th><th>الاسم</th><th>المسجد</th><th>الأفراد</th><th>الأولوية</th></tr>${nl.map(p=>`<tr><td><input type="checkbox" data-c="${p.id}" ${ex.has(p.id)?'':'checked'}></td><td>${esc(p.name)}</td><td>${esc(mname(p.m))}</td><td>${p.fam}</td><td>${esc(p.prio)}</td></tr>`).join('')}</table></div>`:'<div class="empty">لا يوجد مرشحون. رشّح من تبويب السكان أو استخدم الترشيح التلقائي.</div>'}</div>
+ ${S2.length?smsBox('b','رسالة للمستفيدين المحددين',S2.map(p=>({'الاسم':p.name,phone:p.phone,'المسجد':mname(p.m)})),CF.sms)+smsBox('m','إعلام الأعضاء بالترشيح',mem.map(a=>({'الاسم':a.name,phone:a.phone,'العدد':S2.filter(p=>a.role==='member'?p.m===a.m:true).length})),'السلام عليكم {الاسم}، تم ترشيح {العدد} أسرة للمساعدة، يرجى المراجعة.'):''}`;
+ bfm();document.querySelectorAll('[data-c]').forEach(c=>c.onchange=()=>{c.checked?ex.delete(c.dataset.c):ex.add(c.dataset.c);vNom()});
+ $('#auto').onclick=()=>{const lim=new Date(Date.now()-30*864e5).toISOString().slice(0,10),n=+$('#an').value||10;
+  vis().filter(p=>!p.nom&&(!p.last||p.last<=lim)).sort((a,b)=>PR.indexOf(a.prio)-PR.indexOf(b.prio)||(+b.fam||0)-(+a.fam||0)).slice(0,n).forEach(p=>set('pp',{...p,nom:true}));ev('ترشيح تلقائي لأعلى '+n+' أسرة');toast('تم الترشيح')};
+ $('#x1').onclick=()=>xl(S2.map(rowOut),'ترشيحات-'+today()+'.xlsx');
+ $('#rec').onclick=()=>{if(!S2.length||!confirm('تسجيل استلام '+S2.length+' أسرة؟'))return;const t=$('#at').value;
+  S2.forEach(p=>{set('ai',{id:uid('a'),pid:p.id,name:p.name,idno:p.idno,phone:p.phone,m:p.m,type:t,date:today(),by:ME.name});set('pp',{...p,nom:false,last:today(),lt:t})});
+  ev('تسجيل استلام ('+t+') لـ '+S2.length+' أسرة – '+ms.map(mname).join('، '));toast('تم التسجيل في المستفيدين')}}
+function vAid(){
+ const L=D.ai.filter(a=>(all()?(fm==='all'||a.m===fm):a.m===ME.m)&&(fa==='all'||a.type===fa)).sort((a,b)=>b.date.localeCompare(a.date));
+ $('#main').innerHTML=`<div class="tools">${mbar()}<select id="fa"><option value="all">كل الأنواع</option>${AT.map(x=>`<option ${fa===x?'selected':''}>${x}</option>`).join('')}</select><button class="btn alt" id="xa">تصدير Excel</button></div><div class="card tw">${L.length?`<table><tr><th>الاسم</th><th>المسجد</th><th>نوع الاستفادة</th><th>التاريخ</th><th>سجّله</th></tr>${L.map(a=>`<tr><td>${esc(a.name)}</td><td>${esc(mname(a.m))}</td><td><span class="tag ok">${esc(a.type)}</span></td><td>${a.date}</td><td>${esc(a.by)}</td></tr>`).join('')}</table>`:'<div class="empty">لا توجد استفادات مسجلة</div>'}</div>`;
+ bfm();$('#fa').onchange=e=>{fa=e.target.value;vAid()};$('#xa').onclick=()=>xl(L.map(a=>({'الاسم':a.name,'الهوية':a.idno,'الجوال':a.phone,'المسجد':mname(a.m),'نوع الاستفادة':a.type,'التاريخ':a.date,'سجّله':a.by})),'المستفيدون-'+today()+'.xlsx')}
+function vReq(){
+ const L=D.rq.filter(r=>all()||r.by===ME.u).sort((a,b)=>(a.st==='pending'?0:1)-(b.st==='pending'?0:1)||b.t-a.t),cl={pending:'w',ok:'ok',no:'no'},tx={pending:'بانتظار القرار',ok:'مقبول',no:'مرفوض'};
+ $('#main').innerHTML=(all()&&!isM()?'<p style="color:var(--mut)">الإداري يشاهد الطلبات فقط، والقبول والرفض للمدير.</p>':'')+(L.length?L.map(r=>`<div class="card"><div class="tools" style="margin:0"><b>طلب ${RT[r.type]}</b><span class="tag">${esc(mname(r.m))}</span><span class="tag ${cl[r.st]}">${tx[r.st]}</span></div><div>${esc(r.pname||'')}</div><small style="color:var(--mut)">${esc(r.byName)} · ${new Date(r.t).toLocaleString('ar')}${r.dec?' · القرار: '+esc(r.dec):''}${r.why?' · السبب: '+esc(r.why):''}</small>${isM()&&r.st==='pending'?`<div class="tools" style="margin:10px 0 0"><button class="btn s" data-a="${r.id}">قبول</button><button class="btn red s" data-r="${r.id}">رفض</button></div>`:''}</div>`).join(''):'<div class="empty">لا توجد طلبات</div>');
+ const dc=async(id,ok)=>{const r=D.rq.find(x=>x.id===id);let why='';if(!ok)why=prompt('سبب الرفض (اختياري)')||'';
+  if(ok){if(r.type==='del')del('pp',r.pid);else if(r.type==='imp')r.rows.forEach(x=>set('pp',x));else set('pp',r.data)}
+  set('rq',{...r,st:ok?'ok':'no',why,dec:ME.name});ev((ok?'اعتماد ':'رفض ')+'طلب '+RT[r.type]+' – '+mname(r.m))};
+ document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>dc(b.dataset.a,1));document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>dc(b.dataset.r,0))}
+function vUsr(){
+ $('#main').innerHTML=`<div class="card"><h2>إنشاء حساب</h2><div class="f"><label>الاسم<input id="u_n"></label><label>الجوال<input id="u_t" inputmode="tel"></label><label>اسم المستخدم (إنجليزي)<input id="u_u" dir="ltr"></label><label>كلمة المرور<input id="u_p"></label><label>الصلاحية<select id="u_r"><option value="member">عضو</option>${isM()?'<option value="admin">إداري</option>':''}</select></label><label>المسجد (للعضو)<select id="u_m">${mopts('')}</select></label></div><div class="tools" style="margin-top:12px"><button class="btn" id="u_ok">إنشاء</button></div></div>
+ <div class="card tw"><h2>الحسابات</h2><table><tr><th>الاسم</th><th>المستخدم</th><th>الصلاحية</th><th>المسجد</th><th>الجوال</th><th></th></tr>${D.ac.map(a=>`<tr><td>${esc(a.name)}</td><td dir="ltr">${esc(a.u)}</td><td>${RN[a.role]}</td><td>${a.role==='member'?esc(mname(a.m)):'—'}</td><td>${esc(a.phone)}</td><td>${isM()&&a.u!==ME.u?`<button class="btn red s" data-x="${a.u}">حذف</button>`:''}</td></tr>`).join('')}</table></div>`;
+ $('#u_ok').onclick=async()=>{const u=$('#u_u').value.trim().toLowerCase(),p=$('#u_p').value,n=$('#u_n').value.trim(),role=$('#u_r').value;if(!/^[a-z0-9_.-]{3,}$/.test(u)||p.length<6||!n)return toast('أكمل البيانات (كلمة المرور 6 أحرف على الأقل)');
+  try{await mkAcct({u,pw:p,name:n,phone:$('#u_t').value.trim(),role,m:role==='member'?$('#u_m').value:''});ev('إنشاء حساب '+RN[role]+': '+n);toast('تم إنشاء الحساب')}catch(e){toast(e.code==='auth/email-already-in-use'?'اسم المستخدم مستخدم سابقاً':'تعذر الإنشاء')}};
+ document.querySelectorAll('[data-x]').forEach(b=>b.onclick=()=>{const a=D.ac.find(x=>x.u===b.dataset.x);if(confirm('حذف حساب '+a.name+'؟ لا يمكن إعادة استخدام اسم المستخدم.')){del('ac',a.u);ev('حذف حساب '+a.name)}})}
+function vEv(){const L=[...D.ev].sort((a,b)=>b.t-a.t).slice(0,150);
+ $('#main').innerHTML=`<div class="tools"><b>سجل الأحداث والتعديلات</b><button class="btn alt" id="sn">تحديد الكل كمقروء</button></div>`+(L.length?L.map(e=>`<div class="log ${e.seen?'':'new'}">${esc(e.txt)}<br><small>${esc(e.by)} · ${new Date(e.t).toLocaleString('ar')}</small></div>`).join(''):'<div class="empty">لا توجد أحداث</div>');
+ $('#sn').onclick=()=>D.ev.filter(e=>!e.seen).forEach(e=>set('ev',{...e,seen:true}))}
+function vSet(){
+ $('#main').innerHTML=`<div class="card"><h2>المساجد</h2>${CF.mosques.map(m=>`<div class="tools"><input data-r="${m.id}" value="${esc(m.name)}" style="flex:1"><span class="tag">${D.pp.filter(p=>p.m===m.id).length} أسرة</span></div>`).join('')}</div>
+ <div class="card"><h2>نص رسالة المستفيدين</h2><textarea id="sm" rows="3" style="width:100%">${esc(CF.sms)}</textarea><small>المتغيرات: {الاسم} {المسجد}</small><div class="tools" style="margin-top:8px"><button class="btn" id="ss">حفظ</button></div></div>`;
+ document.querySelectorAll('[data-r]').forEach(i=>i.onchange=()=>{if(i.value.trim())set('cf',{id:'main',...CF,mosques:CF.mosques.map(m=>m.id===i.dataset.r?{...m,name:i.value.trim()}:m)})});
+ $('#ss').onclick=()=>{set('cf',{id:'main',...CF,sms:$('#sm').value});toast('تم الحفظ')}}
+firebase.initializeApp(FIREBASE_CONFIG);const AU=firebase.auth();DB=firebase.firestore();
+let UN=[];const on=(q,c)=>UN.push(q.onSnapshot(s=>{D[c]=s.docs.map(d=>d.data());rdy[c]=1;rd()},e=>console.error(c,e)));
+AU.onAuthStateChanged(async u=>{UN.forEach(f=>f());UN=[];ME=null;rdy={};D={pp:[],ac:[],rq:[],ai:[],ev:[]};$('#hd').innerHTML='';
+ if(!u){$('#nav').innerHTML='';login();return}
+ const un=u.email.split('@')[0];let a;try{a=(await DB.doc('ac/'+un).get()).data()}catch(e){}
+ if(!a){toast('الحساب غير مفعّل');AU.signOut();return}
+ ME=a;const C=c=>DB.collection(c),mem=a.role==='member';
+ if(mem)UN.push(DB.doc('ac/'+un).onSnapshot(s=>{ME=s.data();D.ac=[ME];rdy.ac=1;rd()}));else on(C('ac'),'ac');
+ on(mem?C('pp').where('m','==',a.m):C('pp'),'pp');on(mem?C('ai').where('m','==',a.m):C('ai'),'ai');on(mem?C('rq').where('by','==',un):C('rq'),'rq');
+ if(a.role==='manager')on(C('ev'),'ev');else rdy.ev=1;
+ UN.push(DB.doc('cf/main').onSnapshot(s=>{if(s.exists){const c=s.data();CF={mosques:c.mosques||CF.mosques,sms:c.sms||CF.sms}}else if(a.role==='manager')set('cf',{id:'main',...CF});rdy.cf=1;rd()}));
+ draw()});
+</script>
+</body>
+</html>
