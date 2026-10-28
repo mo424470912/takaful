@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>تكافل – نظام لجنة الإغاثة</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#12302b">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -49,12 +53,14 @@ a.sms{color:var(--ok);font-weight:700;text-decoration:none}
 </style>
 </head>
 <body>
-<header><h1>تكافل</h1><div id="hd" class="tools" style="margin:0"></div></header>
+<header><h1 style="display:flex;align-items:center;gap:8px"><img src="logo.svg" alt="" width="32" height="32" onerror="this.style.display='none'">تكافل</h1><div id="hd" class="tools" style="margin:0"></div></header>
 <nav id="nav"></nav><main id="main"><div class="empty">جاري التحميل…</div></main>
 <dialog id="dlg"></dialog><input type="file" id="file" accept=".xlsx,.xls,.csv" hidden><div id="toast"></div>
 <script>
 // الصق هنا إعدادات مشروع Firebase (Project settings > Your apps)
-const FIREBASE_CONFIG={apiKey:'',authDomain:'',projectId:'',storageBucket:'',messagingSenderId:'',appId:''};
+const FIREBASE_CONFIG={apiKey:'AIzaSyBJW2FOJMOL5hAmaeEFKgIQvojpXkwcu9g',authDomain:'takaful-b9789.firebaseapp.com',projectId:'takaful-b9789',storageBucket:'takaful-b9789.firebasestorage.app',messagingSenderId:'836402033869',appId:'1:836402033869:web:2fabbc303bbc58eacca584'};
+window.addEventListener('error',e=>{const m=document.getElementById('main');if(m&&/جاري التحميل/.test(m.textContent))m.innerHTML='<div class="empty">حدث خطأ: '+String(e.message||'').replace(/</g,'')+'</div>'});
+setTimeout(()=>{const m=document.getElementById('main');if(m&&/جاري التحميل/.test(m.textContent))m.innerHTML='<div class="empty">تعذر الاتصال بـ Firebase.<br>تأكد من الإنترنت، وجرّب متصفحاً آخر، وأوقف أي VPN أو حاجب إعلانات.<br>إذا استمرت المشكلة تأكد من نشر القواعد (Rules) في Firestore.</div>'},12000);
 const $=s=>document.querySelector(s),esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),today=()=>new Date().toISOString().slice(0,10);
 const RN={manager:'مدير',admin:'إداري',member:'عضو'},ST=['محتاج','أرمل/ة','أيتام','مريض','كبير سن','عادي'],PR=['عالية','متوسطة','عادية'],AT=['كابونة','طرد غذائي','مساعدة نقدية','بطانيات','أخرى'],RT={add:'إضافة',edit:'تعديل',del:'حذف',imp:'استيراد'};
 const MN=['الأول','الثاني','الثالث','الرابع','الخامس','السادس'];
@@ -181,9 +187,14 @@ function vSet(){
  <div class="card"><h2>نص رسالة المستفيدين</h2><textarea id="sm" rows="3" style="width:100%">${esc(CF.sms)}</textarea><small>المتغيرات: {الاسم} {المسجد}</small><div class="tools" style="margin-top:8px"><button class="btn" id="ss">حفظ</button></div></div>`;
  document.querySelectorAll('[data-r]').forEach(i=>i.onchange=()=>{if(i.value.trim())set('cf',{id:'main',...CF,mosques:CF.mosques.map(m=>m.id===i.dataset.r?{...m,name:i.value.trim()}:m)})});
  $('#ss').onclick=()=>{set('cf',{id:'main',...CF,sms:$('#sm').value});toast('تم الحفظ')}}
-firebase.initializeApp(FIREBASE_CONFIG);const AU=firebase.auth();DB=firebase.firestore();
-let UN=[];const on=(q,c)=>UN.push(q.onSnapshot(s=>{D[c]=s.docs.map(d=>d.data());rdy[c]=1;rd()},e=>console.error(c,e)));
-AU.onAuthStateChanged(async u=>{UN.forEach(f=>f());UN=[];ME=null;rdy={};D={pp:[],ac:[],rq:[],ai:[],ev:[]};$('#hd').innerHTML='';
+let AU,UN=[];const ld=u=>new Promise((r,j)=>{const e=document.createElement('script');e.src=u;e.onload=r;e.onerror=j;document.head.appendChild(e)});
+async function libs(){for(const b of ['https://www.gstatic.com/firebasejs/10.12.2/','https://cdn.jsdelivr.net/npm/firebase@10.12.2/','https://unpkg.com/firebase@10.12.2/']){try{for(const n of ['app','auth','firestore'])await ld(b+'firebase-'+n+'-compat.js');if(window.firebase)return true}catch(e){}}return false}
+const on=(q,c)=>UN.push(q.onSnapshot(s=>{D[c]=s.docs.map(d=>d.data());rdy[c]=1;rd()},e=>{console.error(c,e);toast('تعذر تحميل '+c+': '+(e.code||''))}));
+async function boot0(){
+ if(typeof firebase==='undefined'&&!(await libs())){$('#main').innerHTML='<div class="empty">تعذر تحميل مكتبة Firebase من الإنترنت.<br>افتح الرابط في متصفح Chrome (وليس من داخل تطبيق)، وجرّب شبكة أخرى أو VPN.</div>';return}
+ if(typeof XLSX==='undefined')ld('https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js').catch(()=>{});
+ firebase.initializeApp(FIREBASE_CONFIG);AU=firebase.auth();DB=firebase.firestore();
+ AU.onAuthStateChanged(async u=>{UN.forEach(f=>f());UN=[];ME=null;rdy={};D={pp:[],ac:[],rq:[],ai:[],ev:[]};$('#hd').innerHTML='';
  if(!u){$('#nav').innerHTML='';login();return}
  const un=u.email.split('@')[0];let a;try{a=(await DB.doc('ac/'+un).get()).data()}catch(e){}
  if(!a){toast('الحساب غير مفعّل');AU.signOut();return}
@@ -191,8 +202,9 @@ AU.onAuthStateChanged(async u=>{UN.forEach(f=>f());UN=[];ME=null;rdy={};D={pp:[]
  if(mem)UN.push(DB.doc('ac/'+un).onSnapshot(s=>{ME=s.data();D.ac=[ME];rdy.ac=1;rd()}));else on(C('ac'),'ac');
  on(mem?C('pp').where('m','==',a.m):C('pp'),'pp');on(mem?C('ai').where('m','==',a.m):C('ai'),'ai');on(mem?C('rq').where('by','==',un):C('rq'),'rq');
  if(a.role==='manager')on(C('ev'),'ev');else rdy.ev=1;
- UN.push(DB.doc('cf/main').onSnapshot(s=>{if(s.exists){const c=s.data();CF={mosques:c.mosques||CF.mosques,sms:c.sms||CF.sms}}else if(a.role==='manager')set('cf',{id:'main',...CF});rdy.cf=1;rd()}));
- draw()});
+ UN.push(DB.doc('cf/main').onSnapshot(s=>{if(s.exists){const c=s.data();CF={mosques:c.mosques||CF.mosques,sms:c.sms||CF.sms}}else if(a.role==='manager')set('cf',{id:'main',...CF});rdy.cf=1;rd()},e=>toast('خطأ: '+(e.code||''))));
+ draw()})}
+boot0();
 </script>
 </body>
 </html>
