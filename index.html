@@ -66,14 +66,36 @@ body.out{background:radial-gradient(circle at 80% 0,#e9d7bf99,transparent 40%),r
 .out aside,.out .top{display:none}.out main{max-width:none;min-height:100vh;display:grid;place-items:center;padding:22px}
 .login{width:min(430px,100%);margin:0;padding:32px;border-radius:25px;box-shadow:0 22px 70px #7e5c3d17}
 .login .btn{min-height:43px}
-@media(max-width:860px){.app{display:block}aside{position:fixed;inset:auto 0 0 0;top:auto;width:auto;height:auto;flex-direction:row;padding:7px 6px calc(7px + env(safe-area-inset-bottom,0px));z-index:20;border-radius:20px 20px 0 0;box-shadow:0 -8px 28px #5b41241a;border:1px solid #e9e1d5;border-bottom:0;background:#fffefa}.brand{display:none}nav{flex-direction:row;gap:3px;width:100%;justify-content:space-around}nav button{flex-direction:column;gap:3px;padding:7px 8px;font-size:11px;width:auto;min-width:0;flex:1;justify-content:center;align-items:center;text-align:center;position:relative;border-radius:12px}nav svg{width:19px;height:19px}nav b{position:absolute;top:1px;inset-inline-start:8px;margin:0}main{padding:18px 12px 105px}.top{padding:12px 15px}.top h2{font-size:20px}.me small{display:none}.bar{grid-template-columns:80px 1fr 36px}.f{grid-template-columns:1fr}.card{padding:16px;border-radius:17px}.grid{gap:10px;grid-template-columns:repeat(2,minmax(0,1fr))}.kpi{padding:15px}.kpi div{font-size:30px}.tools input,.tools select{max-width:100%}.login{padding:25px}}
+
+/* تنقل أوضح وحركة هادئة */
+html{scroll-behavior:smooth;scroll-padding-top:82px}
+button,select,input,textarea,.card,.kpi{ -webkit-tap-highlight-color:transparent }
+button:focus-visible{outline:3px solid #c58b5280;outline-offset:2px}
+#main{animation:pageIn .22s ease both}
+@keyframes pageIn{from{opacity:.55;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.card,.kpi{transition:box-shadow .2s,border-color .2s}
+.card:hover{border-color:#e2d1bb}
+.tools{gap:10px}
+.tools>*{max-width:100%}
+.tools input,.tools select{min-height:42px}
+.tw{overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+tbody tr,table tr{transition:background .15s}
+.more-menu{position:fixed;z-index:31;inset-inline:12px;bottom:calc(76px + env(safe-area-inset-bottom,0px));background:#fffefa;border:1px solid var(--line);border-radius:20px;padding:10px;box-shadow:0 18px 50px #4d38251f;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;animation:menuIn .18s ease both}
+.more-menu[hidden],.menu-shade[hidden]{display:none}
+.more-menu button{display:flex;align-items:center;gap:9px;text-align:right;border:1px solid #eee4d8;border-radius:13px;background:#fcf8f2;padding:12px;color:#6d543a;font-weight:700;min-height:48px}
+.more-menu button.on{background:#f2e2ce;border-color:#e3c9a9;color:#805a35}
+.more-menu svg{width:20px;height:20px;flex:none}
+.menu-shade{position:fixed;inset:0;background:#30251b40;backdrop-filter:blur(2px);z-index:29}
+@keyframes menuIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(min-width:861px){.more-menu,.menu-shade{display:none!important}}
+@media(max-width:860px){.app{display:block}aside{position:fixed;inset:auto 0 0 0;top:auto;width:auto;height:auto;flex-direction:row;padding:7px 6px calc(7px + env(safe-area-inset-bottom,0px));z-index:20;border-radius:20px 20px 0 0;box-shadow:0 -8px 28px #5b41241a;border:1px solid #e9e1d5;border-bottom:0;background:#fffefa}.brand{display:none}nav{flex-direction:row;gap:3px;width:100%;justify-content:space-around;overflow:visible}nav button{flex-direction:column;gap:3px;padding:7px 4px;font-size:11px;width:auto;min-width:0;flex:1;justify-content:center;align-items:center;text-align:center;position:relative;border-radius:12px;min-height:54px}nav svg{width:20px;height:20px}nav b{position:absolute;top:1px;inset-inline-start:8px;margin:0}nav button.on{background:#f5e7d5;box-shadow:none;border-color:#ead4b9}nav button.on:after{content:"";position:absolute;top:2px;width:20px;height:3px;border-radius:3px;background:#b98650}main{padding:18px 12px 105px}.top{padding:12px 15px}.top h2{font-size:20px}.me small{display:none}.bar{grid-template-columns:80px 1fr 36px}.f{grid-template-columns:1fr}.card{padding:16px;border-radius:17px}.grid{gap:10px;grid-template-columns:repeat(2,minmax(0,1fr))}.kpi{padding:15px}.kpi div{font-size:30px}.tools input,.tools select{max-width:100%}.login{padding:25px}}
 @media(max-width:380px){nav button{font-size:10px;padding-inline:4px}.grid{grid-template-columns:1fr 1fr}.kpi div{font-size:27px}}
 </style>
 </head>
 <body>
 <div class="app"><aside><div class="brand"><img src="logo.svg" width="40" height="40" alt="" onerror="this.style.display='none'"><div>تكافل<small>نظام لجنة الإغاثة</small></div></div><nav id="nav"></nav></aside>
 <div class="content"><header class="top"><h2 id="ttl">تكافل</h2><div id="hd" class="me"></div></header><main id="main"><div class="empty">جاري التحميل…</div></main></div></div>
-<dialog id="dlg"></dialog><input type="file" id="file" accept=".xlsx,.xls,.csv" hidden><div id="toast"></div>
+<div id="moreMenu" class="more-menu" hidden></div><div id="menuShade" class="menu-shade" hidden></div><dialog id="dlg"></dialog><input type="file" id="file" accept=".xlsx,.xls,.csv" hidden><div id="toast"></div>
 <script>
 // الصق هنا إعدادات مشروع Firebase (Project settings > Your apps)
 const FIREBASE_CONFIG={apiKey:'AIzaSyBJW2FOJMOL5hAmaeEFKgIQvojpXkwcu9g',authDomain:'takaful-b9789.firebaseapp.com',projectId:'takaful-b9789',storageBucket:'takaful-b9789.firebasestorage.app',messagingSenderId:'836402033869',appId:'1:836402033869:web:2fabbc303bbc58eacca584'};
@@ -99,6 +121,7 @@ const vis=()=>D.pp.filter(p=>all()?(fm==='all'||p.m===fm):p.m===ME.m);
 const rd=()=>{if(document.querySelector('dialog[open]')||/INPUT|TEXTAREA|SELECT/.test((document.activeElement||{}).tagName||''))return;draw()};
 function mbar(){return all()?`<select id="fm">${mopts(fm,1)}</select>`:`<span class="tag">${esc(mname(ME.m))}</span>`}
 function bfm(){const e=$('#fm');if(e)e.onchange=()=>{fm=e.value;draw()}}
+function closeMore(){const m=$('#moreMenu'),s=$('#menuShade'),b=$('#moreBtn');if(m)m.hidden=true;if(s)s.hidden=true;if(b)b.setAttribute('aria-expanded','false')}
 function draw(){
  if(!ME||!(rdy.ac&&rdy.cf))return;
  document.body.classList.toggle('out',!ME);$('#hd').innerHTML=ME?`<div class="av">${esc((ME.name||'?').trim()[0])}</div><div><b>${esc(ME.name)}</b><small>${RN[ME.role]}${ME.role==='member'?' · '+esc(mname(ME.m)):''}</small></div><button class="btn alt s" id="pw">كلمة المرور</button><button class="btn alt s" id="lo">خروج</button>`:'';
@@ -108,8 +131,17 @@ function draw(){
  const T=[['stats','الإحصائيات'],['people','السكان'],['nom','الترشيح والاستلام'],['aid','المستفيدون'],['req','طلبات الاعتماد'+(isM()?b(pe):'')]];
  if(all())T.push(['usr','الحسابات']);if(isM())T.push(['ev','الإشعارات'+b(ue)],['set','الإعدادات']);
  if(!T.find(t=>t[0]===tab))tab='stats';
- $('#nav').innerHTML=T.map(t=>`<button class="${tab===t[0]?'on':''}" data-t="${t[0]}"><svg viewBox="0 0 24 24">${IC[t[0]]}</svg><span>${t[1]}</span></button>`).join('');$('#ttl').textContent=(T.find(t=>t[0]===tab)||[0,''])[1].replace(/<b>.*?<\/b>/,'');
- document.querySelectorAll('#nav button').forEach(x=>x.onclick=()=>{tab=x.dataset.t;draw()});
+ const mobile=window.matchMedia('(max-width: 860px)').matches,primary=['stats','people','nom','aid'];
+ const btn=t=>`<button class="${tab===t[0]?'on':''}" data-t="${t[0]}"><svg viewBox="0 0 24 24" aria-hidden="true">${IC[t[0]]}</svg><span>${t[1].replace(/<b>.*?<\/b>/,'')}</span></button>`;
+ const mainTabs=T.filter(t=>primary.includes(t[0])),extraTabs=T.filter(t=>!primary.includes(t[0]));
+ $('#nav').innerHTML=(mobile?mainTabs.map(btn).join('')+`<button id="moreBtn" class="${extraTabs.some(t=>t[0]===tab)?'on':''}" aria-expanded="false"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg><span>المزيد</span></button>`:T.map(btn).join(''));
+ const current=T.find(t=>t[0]===tab)||T[0];$('#ttl').textContent=current[1].replace(/<b>.*?<\/b>/,'');
+ document.querySelectorAll('#nav button[data-t]').forEach(x=>x.onclick=()=>{closeMore();if(tab!==x.dataset.t){tab=x.dataset.t;draw();window.scrollTo({top:0,behavior:'smooth'})}});
+ const menu=$('#moreMenu'),shade=$('#menuShade'),mb=$('#moreBtn');
+ if(mobile){menu.innerHTML=extraTabs.map(t=>`<button class="${tab===t[0]?'on':''}" data-more="${t[0]}"><svg viewBox="0 0 24 24">${IC[t[0]]}</svg><span>${t[1].replace(/<b>.*?<\/b>/,'')}</span></button>`).join('');
+  if(mb)mb.onclick=()=>{const open=menu.hidden;menu.hidden=!open;shade.hidden=!open;mb.setAttribute('aria-expanded',String(open))};
+  menu.querySelectorAll('[data-more]').forEach(x=>x.onclick=()=>{closeMore();tab=x.dataset.more;draw();window.scrollTo({top:0,behavior:'smooth'})});shade.onclick=closeMore;
+ }else closeMore();
  ({stats:vStats,people:vPeople,nom:vNom,aid:vAid,req:vReq,usr:vUsr,ev:vEv,set:vSet})[tab]();
 }
 function login(){
@@ -224,6 +256,7 @@ async function boot0(){
  if(a.role==='manager')on(C('ev'),'ev');else rdy.ev=1;
  UN.push(DB.doc('cf/main').onSnapshot(s=>{if(s.exists){const c=s.data();CF={mosques:c.mosques||CF.mosques,sms:c.sms||CF.sms}}else if(a.role==='manager')set('cf',{id:'main',...CF});rdy.cf=1;rd()},e=>toast('خطأ: '+(e.code||''))));
  draw()})}
+let lastMobile=window.matchMedia('(max-width: 860px)').matches;window.addEventListener('resize',()=>{const now=window.matchMedia('(max-width: 860px)').matches;if(ME&&now!==lastMobile){lastMobile=now;draw()}});
 boot0();
 </script>
 </body>
