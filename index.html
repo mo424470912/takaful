@@ -91,6 +91,11 @@ tbody tr,table tr{transition:background .15s}
 @media(max-width:860px){.app{display:block}aside{position:fixed;inset:auto 0 0 0;top:auto;width:auto;height:auto;flex-direction:row;padding:7px 6px calc(7px + env(safe-area-inset-bottom,0px));z-index:20;border-radius:20px 20px 0 0;box-shadow:0 -8px 28px #5b41241a;border:1px solid #e9e1d5;border-bottom:0;background:#fffefa}.brand{display:none}nav{flex-direction:row;gap:3px;width:100%;justify-content:space-around;overflow:visible}nav button{flex-direction:column;gap:3px;padding:7px 4px;font-size:11px;width:auto;min-width:0;flex:1;justify-content:center;align-items:center;text-align:center;position:relative;border-radius:12px;min-height:54px}nav svg{width:20px;height:20px}nav b{position:absolute;top:1px;inset-inline-start:8px;margin:0}nav button.on{background:#f5e7d5;box-shadow:none;border-color:#ead4b9}nav button.on:after{content:"";position:absolute;top:2px;width:20px;height:3px;border-radius:3px;background:#b98650}main{padding:18px 12px 105px}.top{padding:12px 15px}.top h2{font-size:20px}.me small{display:none}.bar{grid-template-columns:80px 1fr 36px}.f{grid-template-columns:1fr}.card{padding:16px;border-radius:17px}.grid{gap:10px;grid-template-columns:repeat(2,minmax(0,1fr))}.kpi{padding:15px}.kpi div{font-size:30px}.tools input,.tools select{max-width:100%}.login{padding:25px}}
 @media(max-width:380px){nav button{font-size:10px;padding-inline:4px}.grid{grid-template-columns:1fr 1fr}.kpi div{font-size:27px}}
 @media print{aside,.top,.tools,.more-menu,.menu-shade,#toast,nav,[data-e],[data-d],input[type=checkbox],select,.nop{display:none!important}body{background:#fff;color:#000}.card,.kpi{box-shadow:none;border:0}main{padding:0;max-width:none}th{position:static}#main{animation:none}}
+.bell{position:relative;width:42px;height:42px;border-radius:14px;border:1px solid var(--line);background:#fffefa;display:grid;place-items:center;cursor:pointer;color:#6d543a;flex:none}.bell svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.bell b{position:absolute;top:-6px;inset-inline-end:-6px;background:#b94b42;color:#fff;border-radius:20px;font-size:11px;padding:0 6px;min-width:20px;text-align:center;line-height:20px}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}.seg button{border:1px solid var(--line);background:#fffefa;border-radius:20px;padding:8px 18px;cursor:pointer;font-weight:700;color:#77695b}.seg button.on{background:linear-gradient(120deg,#f3e2cc,#f9efe2);border-color:#e9d1b4;color:#805a35}
+@media print{.seg,.bell{display:none!important}}
+.net{border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;white-space:nowrap}.net.off{background:#fbe4e0;color:#a33a28}.net.sync{background:#fbefd5;color:#8a5a12}.net.on{background:#e1f0e5;color:#2f6b43}
+@media print{.net{display:none!important}}
 </style>
 </head>
 <body>
@@ -105,18 +110,22 @@ setTimeout(()=>{const m=document.getElementById('main');if(m&&/جاري التح
 const $=s=>document.querySelector(s),esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),today=()=>new Date().toISOString().slice(0,10);
 const RN={manager:'مدير',admin:'إداري',member:'عضو'},ST=['محتاج','أرمل/ة','أيتام','مريض','كبير سن','عادي'],PR=['عالية','متوسطة','عادية'],AT=['كابونة','طرد غذائي','مساعدة نقدية','بطانيات','أخرى'],RT={add:'إضافة',edit:'تعديل',del:'حذف',imp:'استيراد'};
 const MN=['الأول','الثاني','الثالث','الرابع','الخامس','السادس'];
-let DB,ME=null,D={pp:[],ac:[],rq:[],ai:[],ev:[],tr:[],hist:[]},rdy={},tab='stats',fm='all',fa='all',q='',ex=new Set(),SR={},fs='all',fv='all',lim=100;
+let DB,ME=null,D={ac:[],rq:[],ev:[]},rdy={},tab='db',fm='all',fa='all',q='',ex=new Set(),SR={},fs='all',fv='all',PG={},SD={},FQ=false;
 let CF={mosques:MN.map((n,i)=>({id:'m'+(i+1),name:'المسجد '+n})),sms:'السلام عليكم {الاسم}، تم ترشيحكم لاستلام مساعدة من لجنة الإغاثة. نرجو مراجعة المسجد.'};
-const IC={hist:'<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>',trash:'<path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/>',stats:'<path d="M3 3v18h18"/><path d="M7 15v3M12 9v9M17 5v13"/>',people:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',nom:'<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/>',aid:'<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>',req:'<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',usr:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/>',ev:'<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',set:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>'};
+const IC={db:'<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5"/><path d="M3 12c0 1.7 4 3 9 3s9-1.3 9-3"/>',rep:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/>',bin:'<path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/>',hist:'<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>',trash:'<path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/>',stats:'<path d="M3 3v18h18"/><path d="M7 15v3M12 9v9M17 5v13"/>',people:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',nom:'<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/>',aid:'<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>',req:'<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',usr:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/>',ev:'<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',set:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>'};
 const mname=id=>(CF.mosques.find(m=>m.id===id)||{name:'—'}).name,isM=()=>ME.role==='manager',all=()=>ME.role!=='member';
 const toast=t=>{const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>e.style.display='none',2800)};
 function toastU(t,fn){const e=$('#toast');e.innerHTML=esc(t)+' <button class="btn gold s" id="ut" style="margin-inline-start:10px">تراجع</button>';e.style.display='block';$('#ut').onclick=()=>{e.style.display='none';fn()};clearTimeout(toast.h);toast.h=setTimeout(()=>e.style.display='none',9000)}
-const set=(c,o)=>DB.doc(c+'/'+o.id).set(o).catch(()=>toast('تعذر الحفظ')),del=(c,id)=>DB.doc(c+'/'+id).delete().catch(()=>toast('تعذر الحذف'));
+let PEND=0,OFFW=false;
+const GO=()=>navigator.onLine?{}:{source:'cache'};
+function setNet(){const e=document.getElementById('net');if(!e)return;const off=!navigator.onLine;e.className='net '+(off?'off':PEND?'sync':'on');e.textContent=off?'غير متصل'+(PEND?' · '+PEND+' بانتظار الرفع':''):(PEND?'جاري الرفع…':'متصل');e.hidden=!off&&!PEND}
+const ack=p=>{const off=!navigator.onLine;if(off)OFFW=true;PEND++;setNet();const done=()=>{PEND=Math.max(0,PEND-1);setNet();if(!PEND&&OFFW&&navigator.onLine){OFFW=false;toast('تمت مزامنة كل التعديلات ✓')}};const q=Promise.resolve(p).then(done,e=>{done();console.error(e);toast('رُفض حفظ تعديل ('+((e&&e.code)||'')+')')});return off?Promise.resolve():Promise.race([q,new Promise(r=>setTimeout(r,2500))])};
+const set=(c,o)=>ack(DB.doc(c+'/'+o.id).set(o)),del=(c,id)=>ack(DB.doc(c+'/'+id).delete());
 const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 const ev=t=>set('ev',{id:uid('e'),t:Date.now(),txt:t,by:ME.name,seen:false});
 const sec=()=>firebase.initializeApp(FIREBASE_CONFIG,'s'+Date.now()),fin=a=>{a.auth().signOut().catch(()=>{});a.delete().catch(()=>{})};
 async function mkAcct(o){const a=sec();try{await a.auth().createUserWithEmailAndPassword(o.u+'@relief.app',o.pw);await set('ac',{id:o.u,u:o.u,name:o.name,phone:o.phone,role:o.role,m:o.m||'',t:Date.now()})}finally{fin(a)}}
-async function boot(o){const a=sec();try{await a.auth().createUserWithEmailAndPassword(o.u+'@relief.app',o.pw);const f=a.firestore(),b=f.batch();b.set(f.doc('ac/'+o.u),{id:o.u,u:o.u,name:o.name,phone:o.phone,role:'manager',m:'',t:Date.now()});b.set(f.doc('cf/boot'),{id:'boot',t:Date.now()});await b.commit()}finally{fin(a)}}
+async function boot(o){const a=sec();try{await a.auth().createUserWithEmailAndPassword(o.u+'@relief.app',o.pw);const f=a.firestore(),b=f.batch();b.set(f.doc('ac/'+o.u),{id:o.u,u:o.u,name:o.name,phone:o.phone,role:'manager',m:'',t:Date.now()});b.set(f.doc('cf/boot'),{id:'boot',t:Date.now()});await ack(b.commit())}finally{fin(a)}}
 const dl=(n,b)=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=n;a.click()};
 const mopts=(v,a)=>(a?'<option value="all">كل المساجد</option>':'')+CF.mosques.map(m=>`<option value="${m.id}" ${v===m.id?'selected':''}>${esc(m.name)}</option>`).join('');
 const vis=()=>D.pp.filter(p=>all()?(fm==='all'||p.m===fm):p.m===ME.m);
@@ -126,30 +135,32 @@ function bfm(){const e=$('#fm');if(e)e.onchange=()=>{fm=e.value;draw()}}
 function closeMore(){const m=$('#moreMenu'),s=$('#menuShade'),b=$('#moreBtn');if(m)m.hidden=true;if(s)s.hidden=true;if(b)b.setAttribute('aria-expanded','false')}
 function draw(){
  if(!ME||!(rdy.ac&&rdy.cf))return;
- document.body.classList.toggle('out',!ME);$('#hd').innerHTML=ME?`<div class="av">${esc((ME.name||'?').trim()[0])}</div><div><b>${esc(ME.name)}</b><small>${RN[ME.role]}${ME.role==='member'?' · '+esc(mname(ME.m)):''}</small></div><button class="btn alt s" id="pw">كلمة المرور</button><button class="btn alt s" id="lo">خروج</button>`:'';
- if(!ME)return login();
- $('#pw').onclick=pwDlg;$('#lo').onclick=()=>AU.signOut();
- const pe=D.rq.filter(r=>r.st==='pending').length,ue=D.ev.filter(e=>!e.seen).length,b=n=>n?`<b>${n}</b>`:'';
- const T=[['stats','الإحصائيات'],['people','السكان'],['nom','الترشيح والاستلام'],['aid','المستفيدون'],['req','طلبات الاعتماد'+(isM()?b(pe):'')]];
- if(all())T.push(['usr','الحسابات']);if(isM())T.push(['ev','الإشعارات'+b(ue)],['hist','سجل التراجع'],['trash','سلة المهملات'+(D.tr.length?' ('+D.tr.length+')':'')],['set','الإعدادات']);
- if(!T.find(t=>t[0]===tab))tab='stats';
- const mobile=window.matchMedia('(max-width: 860px)').matches,primary=['stats','people','nom','aid'];
- const btn=t=>`<button class="${tab===t[0]?'on':''}" data-t="${t[0]}"><svg viewBox="0 0 24 24" aria-hidden="true">${IC[t[0]]}</svg><span>${t[1].replace(/<b>.*?<\/b>/,'')}</span></button>`;
+ document.body.classList.remove('out');
+ let NS=0;try{NS=+(localStorage.getItem('ns_'+ME.u)||0)}catch(e){}
+ const bn=isM()?D.ev.length:D.rq.filter(r=>r.st!=='pending'&&(r.dt||0)>NS).length;
+ $('#hd').innerHTML=`<span id="net" class="net" hidden></span><button class="bell" id="bell" aria-label="الإشعارات"><svg viewBox="0 0 24 24">${IC.ev}</svg>${bn?`<b>${bn>99?'99+':bn}</b>`:''}</button><div class="av">${esc((ME.name||'?').trim()[0])}</div><div><b>${esc(ME.name)}</b><small>${RN[ME.role]}${ME.role==='member'?' · '+esc(mname(ME.m)):''}</small></div><button class="btn alt s" id="pw">كلمة المرور</button><button class="btn alt s" id="lo">خروج</button>`;
+ setNet();$('#bell').onclick=()=>{tab='ev';draw();window.scrollTo({top:0})};$('#pw').onclick=pwDlg;$('#lo').onclick=()=>AU.signOut();
+ const b=n=>n?`<b>${n}</b>`:'',pe=isM()?D.rq.length:0;
+ const T=[['db','قاعدة البيانات'],['aid','إدارة المساعدات'],['req','طلبات الاعتماد'+b(pe)],['rep','التقارير']];if(isM())T.push(['bin','السلة وسجل التراجع']);if(all())T.push(['set','الإعدادات']);
+ if(!T.find(t=>t[0]===tab)&&tab!=='ev')tab='db';
+ const mobile=window.matchMedia('(max-width: 860px)').matches,primary=['db','aid','req','rep'];
+ const btn=t=>`<button class="${tab===t[0]?'on':''}" data-t="${t[0]}"><svg viewBox="0 0 24 24" aria-hidden="true">${IC[t[0]]}</svg><span>${t[1]}</span></button>`;
  const mainTabs=T.filter(t=>primary.includes(t[0])),extraTabs=T.filter(t=>!primary.includes(t[0]));
- $('#nav').innerHTML=(mobile?mainTabs.map(btn).join('')+`<button id="moreBtn" class="${extraTabs.some(t=>t[0]===tab)?'on':''}" aria-expanded="false"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg><span>المزيد</span></button>`:T.map(btn).join(''));
- const current=T.find(t=>t[0]===tab)||T[0];$('#ttl').textContent=current[1].replace(/<b>.*?<\/b>/,'');
- document.querySelectorAll('#nav button[data-t]').forEach(x=>x.onclick=()=>{closeMore();if(tab!==x.dataset.t){tab=x.dataset.t;draw();window.scrollTo({top:0,behavior:'smooth'})}});
+ $('#nav').innerHTML=(mobile?mainTabs.map(btn).join('')+(extraTabs.length?`<button id="moreBtn" class="${extraTabs.some(t=>t[0]===tab)?'on':''}" aria-expanded="false"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg><span>المزيد</span></button>`:''):T.map(btn).join(''));
+ const current=tab==='ev'?['ev','الإشعارات']:(T.find(t=>t[0]===tab)||T[0]);$('#ttl').textContent=current[1].replace(/<b>.*?<\/b>/,'');
+ document.querySelectorAll('#nav button[data-t]').forEach(x=>x.onclick=()=>{closeMore();if(tab!==x.dataset.t){tab=x.dataset.t;FQ=false;draw();window.scrollTo({top:0,behavior:'smooth'})}});
  const menu=$('#moreMenu'),shade=$('#menuShade'),mb=$('#moreBtn');
- if(mobile){menu.innerHTML=extraTabs.map(t=>`<button class="${tab===t[0]?'on':''}" data-more="${t[0]}"><svg viewBox="0 0 24 24">${IC[t[0]]}</svg><span>${t[1].replace(/<b>.*?<\/b>/,'')}</span></button>`).join('');
+ if(mobile){menu.innerHTML=extraTabs.map(t=>`<button class="${tab===t[0]?'on':''}" data-more="${t[0]}"><svg viewBox="0 0 24 24">${IC[t[0]]}</svg><span>${t[1]}</span></button>`).join('');
   if(mb)mb.onclick=()=>{const open=menu.hidden;menu.hidden=!open;shade.hidden=!open;mb.setAttribute('aria-expanded',String(open))};
   menu.querySelectorAll('[data-more]').forEach(x=>x.onclick=()=>{closeMore();tab=x.dataset.more;draw();window.scrollTo({top:0,behavior:'smooth'})});shade.onclick=closeMore;
  }else closeMore();
- ({stats:vStats,people:vPeople,nom:vNom,aid:vAid,req:vReq,usr:vUsr,ev:vEv,hist:vHist,trash:vTrash,set:vSet})[tab]();
+ ({db:vDb,aid:vAidSec,req:vReq,rep:vRep,bin:vBin,set:vSet,ev:vEv})[tab]();
 }
+
 function login(){
  document.body.classList.add('out');
  $('#main').innerHTML=`<div class="card login"><div class="lg"><img src="logo-full.png" alt="تكافل" style="width:min(250px,75%);height:auto;border-radius:0"></div><div class="f"><label class="w">اسم المستخدم<input id="l_u" dir="ltr"></label><label class="w">كلمة المرور<input id="l_p" type="password"></label></div><div class="tools" style="margin-top:12px"><button class="btn" id="l_ok">دخول</button><button class="btn alt s" id="l_s">أول تشغيل؟ إنشاء المدير</button></div></div>`;
- const go=async()=>{try{await AU.signInWithEmailAndPassword($('#l_u').value.trim().toLowerCase()+'@relief.app',$('#l_p').value)}catch(e){toast('بيانات الدخول غير صحيحة')}};
+ const go=async()=>{try{await AU.signInWithEmailAndPassword($('#l_u').value.trim().toLowerCase()+'@relief.app',$('#l_p').value)}catch(e){toast(navigator.onLine?'بيانات الدخول غير صحيحة':'تسجيل الدخول لأول مرة يحتاج إنترنت')}};
  $('#l_ok').onclick=go;$('#l_p').onkeydown=e=>{if(e.key==='Enter')go()};$('#l_s').onclick=setup}
 function setup(){const d=$('#dlg');d.innerHTML=`<h2 style="margin-top:0">إنشاء حساب المدير (مرة واحدة)</h2><div class="f"><label class="w">الاسم<input id="a_n"></label><label>اسم المستخدم (إنجليزي)<input id="a_u" dir="ltr"></label><label>كلمة المرور (6+)<input id="a_p" type="password"></label><label class="w">الجوال<input id="a_t"></label></div><div class="tools" style="margin:14px 0 0"><button class="btn" id="ok">إنشاء</button><button class="btn alt" id="no">إلغاء</button></div>`;d.showModal();$('#no').onclick=()=>d.close();
  $('#ok').onclick=async()=>{const u=$('#a_u').value.trim().toLowerCase(),p=$('#a_p').value,n=$('#a_n').value.trim();if(!/^[a-z0-9_.-]{3,}$/.test(u)||p.length<6||!n)return toast('أكمل البيانات (كلمة المرور 6 أحرف على الأقل)');
@@ -157,59 +168,111 @@ function setup(){const d=$('#dlg');d.innerHTML=`<h2 style="margin-top:0">إنش�
 function pwDlg(){const d=$('#dlg');d.innerHTML=`<h2 style="margin-top:0">تغيير كلمة المرور</h2><div class="f"><label class="w">الحالية<input id="o" type="password"></label><label class="w">الجديدة (6+)<input id="n" type="password"></label></div><div class="tools" style="margin:14px 0 0"><button class="btn" id="ok">حفظ</button><button class="btn alt" id="no">إلغاء</button></div>`;d.showModal();$('#no').onclick=()=>d.close();
  $('#ok').onclick=async()=>{const n=$('#n').value;if(n.length<6)return toast('6 أحرف على الأقل');try{const u=AU.currentUser;await u.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(u.email,$('#o').value));await u.updatePassword(n);ev('قام بتغيير كلمة المرور الخاصة به');d.close();toast('تم التغيير')}catch(e){toast('كلمة المرور الحالية خطأ')}}}
 const bars=(o,mx)=>Object.entries(o).map(([k,v])=>`<div class="bar"><span>${esc(k)}</span><u><i style="width:${mx?Math.round(v/mx*100):0}%"></i></u><b>${v}</b></div>`).join('')||'<div class="empty">لا توجد بيانات</div>';
-function vStats(){
- const P=vis(),ind=P.reduce((a,p)=>a+(+p.fam||0),0),got=P.filter(p=>p.last).length,due=P.filter(p=>!p.last||p.last<=new Date(Date.now()-30*864e5).toISOString().slice(0,10)).length,byS={},byA={};
- P.forEach(p=>byS[p.status]=(byS[p.status]||0)+1);D.ai.filter(a=>all()?(fm==='all'||a.m===fm):a.m===ME.m).forEach(a=>byA[a.type]=(byA[a.type]||0)+1);
- const M=CF.mosques.filter(m=>all()?true:m.id===ME.m),mx=o=>Math.max(1,...Object.values(o));
- const rows=M.map(m=>{const x=D.pp.filter(p=>p.m===m.id);return{'المسجد':m.name,'الأسر':x.length,'الأفراد':x.reduce((a,p)=>a+(+p.fam||0),0),'مرشحون':x.filter(p=>p.nom).length,'استلموا':x.filter(p=>p.last).length}});
- $('#main').innerHTML=(isM()&&(!CF.lastBackup||Date.now()-new Date(CF.lastBackup)>7*864e5)?'<div class="card" style="border-color:var(--acc)"><div class="tools" style="margin:0"><b>⚠ لم تأخذ نسخة احتياطية منذ أكثر من أسبوع</b><button class="btn gold s" id="bkn">نسخة الآن</button></div></div>':'')+`<div class="tools">${mbar()}<button class="btn alt" id="xr">تصدير تقرير Excel</button></div><div class="grid"><div class="kpi big"><span>عدد الأسر</span><div>${P.length}</div></div><div class="kpi"><span>الأفراد</span><div>${ind}</div></div><div class="kpi"><span>مرشحون حالياً</span><div>${P.filter(p=>p.nom).length}</div></div><div class="kpi"><span>استلموا</span><div>${got}</div></div><div class="kpi"><span>يستحقون دوراً (30 يوماً+)</span><div>${due}</div></div></div>
- <div class="card tw"><h2>حسب المسجد</h2><table><tr>${Object.keys(rows[0]||{}).map(k=>`<th>${k}</th>`).join('')}</tr>${rows.map(r=>'<tr>'+Object.values(r).map(v=>`<td>${esc(v)}</td>`).join('')+'</tr>').join('')}</table></div>
- <div class="card"><h2>حسب الحالة</h2>${bars(byS,mx(byS))}</div><div class="card"><h2>حسب نوع الاستفادة</h2>${bars(byA,mx(byA))}</div>`;
- bfm();const bn=$('#bkn');if(bn)bn.onclick=backupJSON;$('#xr').onclick=()=>xl(rows,'تقرير-إحصائي-'+today()+'.xlsx')}
+const nz=t=>String(t||'').replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').toLowerCase().trim();
+const kws=p=>{const s=new Set();(nz(p.name)+' '+nz(p.wname)).split(/\s+/).filter(Boolean).forEach(w=>{for(let i=2;i<=Math.min(w.length,8);i++)s.add(w.slice(0,i))});return[...s].slice(0,60)};
+const idOk=v=>/^[0-9]{5,15}$/.test(String(v||''));
+const sd=k=>+SD[k]||0,sum=(M,k)=>M.reduce((a,m)=>a+sd(k+'_'+m.id),0);
+const FVI=n=>firebase.firestore.FieldValue.increment(n);
+const cnt=p=>{if(!p||p.del)return{};const m=p.m,o={};o['t_'+m]=1;o['f_'+m]=+p.fam||0;o['s_'+m+'_'+Math.max(0,ST.indexOf(p.status))]=1;if(p.nom)o['n_'+m]=1;if(p.got)o['g_'+m]=1;return o};
+const dlt=(a,b)=>{const x=cnt(a),y=cnt(b),r={};new Set([...Object.keys(x),...Object.keys(y)]).forEach(k=>{const d=(y[k]||0)-(x[k]||0);if(d)r[k]=d});return r};
+const mrg=(a,d)=>Object.keys(d).forEach(k=>a[k]=(a[k]||0)+d[k]);
+const incs=a=>{const o={};Object.keys(a).forEach(k=>o[k]=FVI(a[k]));return o};
+const stAdd=a=>Object.keys(a).length?ack(DB.doc('st/main').set(incs(a),{merge:true})):0;
+async function wr(ops){for(let i=0;i<ops.length;i+=400){const b=DB.batch(),acc={};ops.slice(i,i+400).forEach(o=>{if(o.n)b.set(DB.doc('pp/'+o.n.id),o.n);else b.delete(DB.doc('pp/'+o.p.id));mrg(acc,dlt(o.p,o.n))});if(Object.keys(acc).length)b.set(DB.doc('st/main'),incs(acc),{merge:true});await ack(b.commit())}}
+async function getMany(ids){const m={};if(ids.length<=5){await Promise.all(ids.map(async id=>{const s=await DB.doc('pp/'+id).get(GO());if(s.exists)m[id]=s.data()}));return m}
+ for(let i=0;i<ids.length;i+=10){const s=await DB.collection('pp').where(firebase.firestore.FieldPath.documentId(),'in',ids.slice(i,i+10)).get(GO());s.docs.forEach(d=>m[d.id]=d.data())}return m}
+async function scan(mk,n=1000,cb){const out=[];let last=null;for(;;){let q=mk();if(last)q=q.startAfter(last);const s=await q.limit(n).get(GO());s.docs.forEach(d=>out.push(d.data()));last=s.docs[s.docs.length-1];if(cb)cb(out.length);if(s.docs.length<n)break}return out}
+function pager(k,sig,mks,flt){let P=PG[k];if(!P||P.sig!==sig){P=PG[k]={sig,rows:[],last:null,done:false,busy:false,i:0,mks,flt,err:''};more(P)}return P}
+async function more(P,n=50){if(P.busy||P.done)return;P.busy=1;let sw=false;try{let q=P.mks[P.i]();if(P.last)q=q.startAfter(P.last);const s=await q.limit(n).get(GO());let rs=s.docs.map(d=>d.data());if(P.flt)rs=rs.filter(P.flt);P.rows.push(...rs);P.last=s.docs[s.docs.length-1]||P.last;
+ if(s.docs.length<n){if(P.i<P.mks.length-1&&!P.rows.length){P.i++;P.last=null;sw=true}else P.done=true}}catch(e){console.error(e);P.err=e.message||'';P.done=true;if(e.code!=='failed-precondition')toast('تعذر التحميل ('+(e.code||'')+')')}
+ P.busy=0;if(sw)return more(P,n);draw()}
+const errBox=P=>{if(!P.err)return'';const u=(P.err.match(/https:\/\/\S+/)||[''])[0].replace(/[.,)]+$/,'');return`<div class="card" style="border-color:var(--acc)">هذا العرض يحتاج فهرساً في Firebase (مرة واحدة). ${u?`<a href="${u}" target="_blank" rel="noopener"><b>اضغط هنا لإنشائه</b></a> ثم انتظر دقيقة وحدّث الصفحة.`:'افتح الكونسول لمعرفة التفاصيل.'}</div>`};
+const moreBtn=P=>P.done?'':`<div class="tools" style="margin:12px 0 0"><button class="btn alt" id="more">${P.busy?'جاري التحميل…':'تحميل المزيد'}</button></div>`;
+const bmore=P=>{const b=$('#more');if(b)b.onclick=()=>more(P)};
+function bq(){let q=DB.collection('pp').where('del','==',false);if(!all())q=q.where('m','==',ME.m);else if(fm!=='all')q=q.where('m','==',fm);return q}
+function pq(){let q=bq();if(fs!=='all')q=q.where('status','==',fs);if(fv==='nom')q=q.where('nom','==',true);else if(fv==='got')q=q.where('got','==',true);else if(fv==='no')q=q.where('got','==',false);return q}
+function sq(w){let q=DB.collection('pp');if(!all())q=q.where('m','==',ME.m);else if(fm!=='all')q=q.where('m','==',fm);return q.where('kw','array-contains',w)}
 const rowOut=p=>({'رقم الهوية':p.idno,'الاسم رباعي':p.name,'عدد الأفراد':p.fam,'رقم الجوال':p.phone,'المسجد':mname(p.m),'الحالة الاجتماعية':p.marital||'','رقم هوية الزوجة':p.wid||'','اسم الزوجة رباعي':p.wname||'','الحالة':p.status,'الأولوية':p.prio,'ملاحظات':p.note||'','آخر استلام':p.last||'','نوع آخر استفادة':p.lt||''});
-function vPeople(){
- const L0=vis().filter(p=>(!q||[p.name,p.idno,p.phone,p.wname,p.wid].join(' ').includes(q))&&(fs==='all'||p.status===fs)&&(fv==='all'||(fv==='nom'?p.nom:fv==='got'?!!p.last:!p.last))).sort((a,b)=>PR.indexOf(a.prio)-PR.indexOf(b.prio)),L=L0.slice(0,lim);
- $('#main').innerHTML=`<div class="tools">${mbar()}<input id="q" placeholder="بحث" value="${esc(q)}" style="flex:1;min-width:140px"><select id="fs"><option value="all">كل الحالات</option>${ST.map(x=>`<option>${x}</option>`).join('')}</select><select id="fv"><option value="all">الكل</option><option value="nom">المرشحون</option><option value="got">استلموا</option><option value="no">لم يستلموا</option></select><button class="btn" id="add">+ ${isM()?'إضافة':'طلب إضافة'}</button><button class="btn alt" id="imp">استيراد</button><button class="btn alt" id="exp">تصدير</button><button class="btn alt" id="prt">طباعة</button><button class="btn alt" id="tpl">نموذج</button></div>
- <div class="card tw">${L.length?`<table><tr><th>مرشّح</th><th>الاسم</th>${all()?'<th>المسجد</th>':''}<th>الجوال</th><th>الأفراد</th><th>الحالة</th><th>الأولوية</th><th>آخر استلام</th><th></th></tr>`+L.map(p=>`<tr><td><input type="checkbox" data-n="${p.id}" ${p.nom?'checked':''}></td><td>${esc(p.name)}</td>${all()?`<td>${esc(mname(p.m))}</td>`:''}<td>${esc(p.phone)}</td><td>${esc(p.fam)}</td><td><span class="tag">${esc(p.status)}</span></td><td><select data-p="${p.id}">${PR.map(x=>`<option ${x===p.prio?'selected':''}>${x}</option>`).join('')}</select></td><td>${esc(p.last||'—')}</td><td><button class="btn alt s" data-e="${p.id}">${isM()?'تعديل':'طلب تعديل'}</button> <button class="btn red s" data-d="${p.id}">${isM()?'حذف':'طلب حذف'}</button></td></tr>`).join('')+'</table>':'<div class="empty">لا توجد أسر</div>'}<div class="tools" style="margin:12px 0 0"><small style="color:var(--mut)">${L0.length} أسرة</small>${L0.length>lim?`<button class="btn alt s" id="more">عرض المزيد (${L0.length-lim})</button>`:''}</div></div>`;
- bfm();$('#fs').value=fs;$('#fv').value=fv;$('#fs').onchange=e=>{fs=e.target.value;lim=100;vPeople()};$('#fv').onchange=e=>{fv=e.target.value;lim=100;vPeople()};const mr=$('#more');if(mr)mr.onclick=()=>{lim+=100;vPeople()};$('#prt').onclick=()=>{lim=1e9;vPeople();setTimeout(()=>window.print(),80)};$('#q').oninput=e=>{q=e.target.value;vPeople();const i=$('#q');i.focus();i.setSelectionRange(q.length,q.length)};
- const fp=id=>D.pp.find(x=>x.id===id);
+const mkP=o=>{const p={id:idOk(o.idno)?String(o.idno):uid('p'),name:o.name,idno:o.idno||'',phone:o.phone||'',fam:+o.fam||1,marital:o.marital||'',wid:o.wid||'',wname:o.wname||'',m:o.m,status:o.status||'محتاج',prio:o.prio||'عادية',note:o.note||'',nom:false,got:false,last:'',lt:'',del:false};p.kw=kws(p);return p};
+const IDK=['name','idno','phone','fam','marital','wid','wname','m','status','note','kw'];
+const sub={db:'list',aid:'nom',bin:'trash',set:'users',req:'p'};
+const subnav=(k,items)=>`<div class="seg">${items.map(([v,l])=>`<button class="${sub[k]===v?'on':''}" data-sub="${k}:${v}">${l}</button>`).join('')}</div>`;
+const bsub=()=>document.querySelectorAll('[data-sub]').forEach(b=>b.onclick=()=>{const[k,v]=b.dataset.sub.split(':');sub[k]=v;draw()});
+async function loadAll(mk,flt){toast('جاري تحميل البيانات…');const r=await scan(mk,1000,c=>toast('تم تحميل '+c));return flt?r.filter(flt):r}
+function vDb(){
+ const qq=q.trim(),qs=nz(qq);let mks,flt=null;
+ if(/^\d{6,}$/.test(qq))mks=[()=>bq().where('idno','==',qq),()=>bq().where('phone','==',qq)];
+ else if(qs.length>=2){const ws=qs.split(/\s+/);mks=[()=>sq(ws[0].slice(0,8))];flt=p=>!p.del&&ws.every(x=>nz(p.name+' '+(p.wname||'')).includes(x))&&(fs==='all'||p.status===fs)&&(fv==='all'||(fv==='nom'?p.nom:fv==='got'?p.got:!p.got))}
+ else mks=[pq];
+ const P=pager('db',JSON.stringify([qq,fm,fs,fv,ME.u]),mks,flt),L=P.rows,M=all()?(fm==='all'?CF.mosques:CF.mosques.filter(m=>m.id===fm)):CF.mosques.filter(m=>m.id===ME.m),tot=sum(M,'t');
+ $('#main').innerHTML=`<div class="tools">${mbar()}<input id="q" placeholder="بحث بالاسم أو الهوية أو الجوال" value="${esc(q)}" style="flex:1;min-width:150px"><select id="fs"><option value="all">كل الحالات</option>${ST.map(x=>`<option>${x}</option>`).join('')}</select><select id="fv"><option value="all">الكل</option><option value="nom">المرشحون</option><option value="got">استلموا</option><option value="no">لم يستلموا</option></select></div>
+ <div class="tools"><button class="btn" id="add">+ ${isM()?'إضافة أسرة':'طلب إضافة'}</button><button class="btn alt" id="imp">استيراد Excel</button><button class="btn alt" id="exp">تصدير Excel</button><button class="btn alt" id="tpl">نموذج الاستيراد</button><button class="btn alt" id="prt">طباعة</button><button class="btn alt" id="off">تجهيز للعمل بدون نت</button></div>${errBox(P)}
+ <div class="card tw">${L.length?`<table><tr><th>مرشّح</th><th>الاسم</th>${all()?'<th>المسجد</th>':''}<th>الهوية</th><th>الجوال</th><th>الأفراد</th><th>الحالة</th><th>الأولوية</th><th>آخر استلام</th><th></th></tr>`+L.map(p=>`<tr><td><input type="checkbox" data-n="${p.id}" ${p.nom?'checked':''}></td><td>${esc(p.name)}</td>${all()?`<td>${esc(mname(p.m))}</td>`:''}<td>${esc(p.idno)}</td><td>${esc(p.phone)}</td><td>${esc(p.fam)}</td><td><span class="tag">${esc(p.status)}</span></td><td><select data-p="${p.id}">${PR.map(x=>`<option ${x===p.prio?'selected':''}>${x}</option>`).join('')}</select></td><td>${esc(p.last||'—')}</td><td><button class="btn alt s" data-e="${p.id}">${isM()?'تعديل':'طلب تعديل'}</button> <button class="btn red s" data-d="${p.id}">${isM()?'حذف':'طلب حذف'}</button></td></tr>`).join('')+'</table>':(P.busy?'<div class="empty">جاري التحميل…</div>':'<div class="empty">لا توجد نتائج</div>')}
+ <div class="tools" style="margin:12px 0 0"><small style="color:var(--mut)">${!qq&&fs==='all'&&fv==='all'?'إجمالي الأسر: '+tot+' · ':''}معروض ${L.length}${P.done?'':'+'}</small></div>${moreBtn(P)}</div>`;
+ bfm();bmore(P);$('#fs').value=fs;$('#fv').value=fv;$('#fs').onchange=e=>{fs=e.target.value;FQ=false;draw()};$('#fv').onchange=e=>{fv=e.target.value;FQ=false;draw()};
+ const qi=$('#q');if(FQ){qi.focus();qi.setSelectionRange(q.length,q.length)}
+ qi.oninput=e=>{q=e.target.value;FQ=true;clearTimeout(vDb.h);vDb.h=setTimeout(draw,450)};
+ const fp=id=>L.find(x=>x.id===id);
  document.querySelectorAll('[data-n]').forEach(c=>c.onchange=()=>{const p=fp(c.dataset.n);chg([{p,pt:{nom:c.checked}}],'nom',(c.checked?'ترشيح ':'إلغاء ترشيح ')+p.name)});
  document.querySelectorAll('[data-p]').forEach(s=>s.onchange=()=>{const p=fp(s.dataset.p);chg([{p,pt:{prio:s.value}}],'prio','أولوية '+p.name+' ← '+s.value)});
- $('#add').onclick=()=>pdlg();document.querySelectorAll('[data-e]').forEach(b=>b.onclick=()=>pdlg(b.dataset.e));
+ $('#add').onclick=()=>pdlg();document.querySelectorAll('[data-e]').forEach(b=>b.onclick=()=>pdlg(fp(b.dataset.e)));
  document.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{const p=fp(b.dataset.d);if(!confirm((isM()?'نقل إلى سلة المهملات: ':'إرسال طلب حذف ')+p.name+'؟'))return;
   if(isM())chg([{p,pt:{del:true,delAt:Date.now(),delBy:ME.name}}],'del','نقل إلى السلة: '+p.name);else sendReq('del',p.m,{pid:p.id,pname:p.name})});
- $('#imp').onclick=()=>$('#file').click();
- $('#exp').onclick=()=>xl(L0.map(rowOut),'سكان-'+today()+'.xlsx');
- $('#tpl').onclick=()=>xl([Object.fromEntries(Object.keys(rowOut({})).slice(0,8).map(k=>[k,'']))],'نموذج-استيراد.xlsx')}
+ $('#off').onclick=prepOffline;$('#imp').onclick=()=>$('#file').click();$('#prt').onclick=()=>window.print();
+ $('#tpl').onclick=()=>xl([Object.fromEntries(Object.keys(rowOut({})).slice(0,8).map(k=>[k,'']))],'نموذج-استيراد.xlsx');
+ $('#exp').onclick=async()=>{const n=!qq&&fs==='all'&&fv==='all'?tot:0;if(!confirm('سيتم تحميل '+(n||'كل النتائج')+' سجل وتصديرها (يستهلك قراءات من الحصة اليومية). المتابعة؟'))return;try{const r=await loadAll(pq);xl(r.map(rowOut),'سكان-'+today()+'.xlsx')}catch(e){toast('تعذر التصدير')}}}
 function sendReq(type,m,x){set('rq',{id:uid('r'),type,m,by:ME.u,byName:ME.name,t:Date.now(),st:'pending',...x});ev('طلب '+RT[type]+' جديد – '+mname(m)+(x.pname?': '+x.pname:''));toast('أُرسل الطلب للمدير')}
-function pdlg(id){
- const p=id?D.pp.find(x=>x.id===id):{id:uid('p'),m:all()?(fm==='all'?CF.mosques[0].id:fm):ME.m,name:'',idno:'',phone:'',fam:1,status:'محتاج',prio:'عادية',note:'',nom:false,last:''},d=$('#dlg');
- d.innerHTML=`<h2 style="margin-top:0">${id?'تعديل':'إضافة'} أسرة</h2><div class="f"><label class="w">الاسم<input id="f_name" value="${esc(p.name)}"></label><label>الهوية<input id="f_idno" value="${esc(p.idno)}"></label><label>الجوال<input id="f_phone" value="${esc(p.phone)}"></label><label>الأفراد<input id="f_fam" type="number" min="1" value="${esc(p.fam)}"></label><label>حالة الاحتياج<select id="f_status">${ST.map(s=>`<option ${s===p.status?'selected':''}>${s}</option>`).join('')}</select></label>${all()?`<label>المسجد<select id="f_m">${mopts(p.m)}</select></label>`:''}<label>الحالة الاجتماعية<select id="f_marital">${['','متزوج','أرمل/ة','مطلق/ة','أعزب'].map(s=>`<option ${s===p.marital?'selected':''}>${s}</option>`).join('')}</select></label><label>رقم هوية الزوجة<input id="f_wid" value="${esc(p.wid)}"></label><label class="w">اسم الزوجة رباعي<input id="f_wname" value="${esc(p.wname)}"></label><label class="w">ملاحظات<input id="f_note" value="${esc(p.note)}"></label></div><div class="tools" style="margin:14px 0 0"><button class="btn" id="ok">${isM()?'حفظ':'إرسال للاعتماد'}</button><button class="btn alt" id="no">إلغاء</button></div>`;
+function pdlg(p0){
+ const p=p0||{id:'',m:all()?(fm==='all'?CF.mosques[0].id:fm):ME.m,name:'',idno:'',phone:'',fam:1,status:'محتاج',prio:'عادية',note:'',marital:'',wid:'',wname:''},d=$('#dlg');
+ d.innerHTML=`<h2 style="margin-top:0">${p0?'تعديل':'إضافة'} أسرة</h2><div class="f"><label class="w">الاسم رباعي<input id="f_name" value="${esc(p.name)}"></label><label>رقم الهوية<input id="f_idno" inputmode="numeric" value="${esc(p.idno)}"></label><label>الجوال<input id="f_phone" inputmode="tel" value="${esc(p.phone)}"></label><label>عدد الأفراد<input id="f_fam" type="number" min="1" value="${esc(p.fam)}"></label><label>حالة الاحتياج<select id="f_status">${ST.map(s=>`<option ${s===p.status?'selected':''}>${s}</option>`).join('')}</select></label>${all()?`<label>المسجد<select id="f_m">${mopts(p.m)}</select></label>`:''}<label>الحالة الاجتماعية<select id="f_marital">${['','متزوج','أرمل/ة','مطلق/ة','أعزب'].map(s=>`<option ${s===p.marital?'selected':''}>${s}</option>`).join('')}</select></label><label>رقم هوية الزوجة<input id="f_wid" value="${esc(p.wid)}"></label><label class="w">اسم الزوجة رباعي<input id="f_wname" value="${esc(p.wname)}"></label><label class="w">ملاحظات<input id="f_note" value="${esc(p.note)}"></label></div><div class="tools" style="margin:14px 0 0"><button class="btn" id="ok">${isM()?'حفظ':'إرسال للاعتماد'}</button><button class="btn alt" id="no">إلغاء</button></div>`;
  d.showModal();$('#no').onclick=()=>d.close();
- $('#ok').onclick=()=>{const g=k=>$('#f_'+k).value.trim();if(!g('name'))return toast('الاسم مطلوب');const n={...p,name:g('name'),idno:g('idno'),phone:g('phone'),fam:+g('fam')||1,status:g('status'),note:g('note'),marital:g('marital'),wid:g('wid'),wname:g('wname'),m:all()?g('m'):p.m};
-  if(n.idno&&D.pp.some(x=>x.idno===n.idno&&x.id!==n.id)&&!confirm('رقم الهوية موجود مسبقاً. هل تريد المتابعة؟'))return;
-  if(isM()){if(id){const pt=diffOf(p,n);if(Object.keys(pt).length)chg([{p,pt}],'edit','تعديل '+n.name)}else addP([n],'إضافة '+n.name,n.m)}else sendReq(id?'edit':'add',n.m,{data:n,pname:n.name});d.close()}}
+ $('#ok').onclick=async()=>{const g=k=>$('#f_'+k).value.trim();if(!g('name'))return toast('الاسم مطلوب');
+  const f={name:g('name'),idno:g('idno'),phone:g('phone'),fam:+g('fam')||1,status:g('status'),note:g('note'),marital:g('marital'),wid:g('wid'),wname:g('wname'),m:all()?g('m'):p.m};
+  try{if(!p0){const n=mkP(f);
+   if(all()&&idOk(n.id)){try{const e=await DB.doc('pp/'+n.id).get(GO());if(e.exists&&!confirm('رقم الهوية موجود مسبقاً'+(e.data().del?' (في السلة)':'')+'. سيتم تحديث البيانات. المتابعة؟'))return}catch(x){}}
+   if(isM())await addP([n],'إضافة '+n.name,n.m);else sendReq('add',n.m,{data:n,pname:n.name})}
+  else{const pt={};Object.keys(f).forEach(k=>{if(String(f[k]==null?'':f[k])!==String(p[k]==null?'':p[k]))pt[k]=f[k]});
+   if(isM()){if(Object.keys(pt).length)await chg([{p:p0,pt}],'edit','تعديل '+f.name)}else sendReq('edit',p.m,{data:{...p,...f},pid:p.id,pname:f.name})}
+  d.close()}catch(e){toast('تعذر الحفظ')}}}
 $('#file').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const dm=all()?(fm==='all'?'':fm):ME.m,r=new FileReader();
- r.onload=()=>{try{const wb=XLSX.read(r.result,{type:'array'}),rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});let n=0;const out=[];
-  let sk=0,dp=0;rows.forEach(x=>{const g=(...k)=>String(k.map(i=>x[i]).find(v=>v!=null&&v!=='')??'').trim(),name=g('الاسم رباعي','الاسم');if(!name)return;const mv=g('المسجد'),mid=all()?((CF.mosques.find(k=>k.name===mv||(mv&&(k.name.includes(mv)||mv.includes(k.name))))||{}).id||dm):dm;if(!mid){sk++;return}const idn=g('رقم الهوية');if(idn&&(D.pp.some(x=>x.idno===idn)||out.some(x=>x.idno===idn))){dp++;return}
-  out.push({id:uid('p')+n++,m:mid,name,idno:g('رقم الهوية'),phone:g('رقم الجوال','الجوال'),fam:+g('عدد الأفراد','أفراد الأسرة')||1,marital:g('الحالة الاجتماعية'),wid:g('رقم هوية الزوجة'),wname:g('اسم الزوجة رباعي','اسم الزوجة'),status:ST.includes(x['الحالة'])?x['الحالة']:'محتاج',prio:PR.includes(x['الأولوية'])?x['الأولوية']:'عادية',note:g('ملاحظات'),nom:false,last:''})});
-  if(!out.length)return toast('لا توجد أسماء صالحة، تأكد من عمود المسجد');if(sk||dp)toast('تم تجاوز '+(sk+dp)+' صف (هوية مكررة أو مسجد غير معروف)');
-  if(isM())addP(out,'استيراد '+out.length+' أسرة من Excel',out[0].m);else sendReq('imp',out[0].m,{rows:out,pname:out.length+' أسرة'})}catch(err){toast('تعذر قراءة الملف')}};r.readAsArrayBuffer(f)};
+ r.onload=()=>{try{const wb=XLSX.read(r.result,{type:'array'}),rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});const out=[];let sk=0;
+  rows.forEach(x=>{const g=(...k)=>String(k.map(i=>x[i]).find(v=>v!=null&&v!=='')??'').trim(),name=g('الاسم رباعي','الاسم');if(!name)return;const mv=g('المسجد'),mid=all()?((CF.mosques.find(k=>k.name===mv||(mv&&(k.name.includes(mv)||mv.includes(k.name))))||{}).id||dm):dm;if(!mid){sk++;return}
+   out.push(mkP({name,idno:g('رقم الهوية'),phone:g('رقم الجوال','الجوال'),fam:g('عدد الأفراد','أفراد الأسرة'),marital:g('الحالة الاجتماعية'),wid:g('رقم هوية الزوجة'),wname:g('اسم الزوجة رباعي','اسم الزوجة'),status:ST.includes(x['الحالة'])?x['الحالة']:'محتاج',prio:PR.includes(x['الأولوية'])?x['الأولوية']:'عادية',note:g('ملاحظات'),m:mid}))});
+  if(!out.length)return toast('لا توجد أسماء صالحة، تأكد من عمود المسجد');if(sk)toast('تم تجاوز '+sk+' صف بدون مسجد معروف');
+  if(isM()){if(confirm('استيراد '+out.length+' أسرة؟ الموجود مسبقاً (نفس رقم الهوية) سيتحدّث.'))addP(out,'استيراد '+out.length+' أسرة من Excel',out[0].m)}
+  else{const by={};out.forEach(p=>(by[p.m]=by[p.m]||[]).push(p));Object.keys(by).forEach(m=>{for(let i=0;i<by[m].length;i+=400){const c=by[m].slice(i,i+400);sendReq('imp',m,{rows:c,pname:c.length+' أسرة'})}})}}catch(err){toast('تعذر قراءة الملف')}};r.readAsArrayBuffer(f)};
+async function upsert(rows){const u={};rows.forEach(r=>u[r.id]=r);rows=Object.values(u);const old=await getMany(rows.filter(r=>idOk(r.id)).map(r=>r.id)),ops=[],add=[];
+ rows.forEach(r=>{const o=old[r.id];if(o){const n={...o,del:false};IDK.forEach(k=>n[k]=r[k]);ops.push({p:o,n})}else{ops.push({p:null,n:r});add.push(r.id)}});
+ await wr(ops);return{add,upd:ops.length-add.length}}
+async function addP(rows,txt,m){try{const r=await upsert(rows);PG={};await hist('add',txt+(r.upd?' (محدّث '+r.upd+')':''),m||rows[0].m,{add:r.add});draw()}catch(e){console.error(e);toast('تعذر الحفظ')}}
 const patchOf=(p,pt)=>{const b={};Object.keys(pt).forEach(k=>b[k]=p[k]===undefined?null:p[k]);return b};
-const diffOf=(p,n)=>{const d={};['name','idno','phone','fam','status','note','marital','wid','wname','m'].forEach(k=>{if(String(n[k]==null?'':n[k])!==String(p[k]==null?'':p[k]))d[k]=n[k]==null?'':n[k]});return d};
 async function hist(kind,txt,m,extra){const h={id:uid('h'),t:Date.now(),by:ME.u,byName:ME.name,kind,txt,m:m||'',items:[],undone:false,...(extra||{})};await set('hist',h);ev(txt+(m?' – '+mname(m):''));if(isM()||kind==='nom'||kind==='prio')toastU('تم: '+txt,()=>undo(h));else toast('تم: '+txt)}
-async function chg(its,kind,txt,m,extra){await Promise.all(its.map(it=>set('pp',{...it.p,...it.pt})));return hist(kind,txt,m||(its[0]&&its[0].p.m),{items:its.map(it=>({pid:it.p.id,b:patchOf(it.p,it.pt)})),...(extra||{})})}
-async function addP(list,txt,m){await Promise.all(list.map(p=>set('pp',p)));return hist('add',txt,m||list[0].m,{add:list.map(p=>p.id)})}
-async function undo(h){if(!h||h.undone)return;
- for(const it of h.items||[]){const cur=D.pp.find(x=>x.id===it.pid)||D.tr.find(x=>x.id===it.pid);if(cur)await set('pp',{...cur,...it.b})}
- for(const id of h.add||[]){const cur=D.pp.find(x=>x.id===id);if(cur)await set('pp',{...cur,del:true,delAt:Date.now(),delBy:ME.name})}
- for(const id of h.ai||[])await del('ai',id);
+async function chg(its,kind,txt,m,extra){try{
+ const ops=its.map(it=>{const pt={...it.pt};if(('name' in pt)||('wname' in pt))pt.kw=kws({...it.p,...pt});return{p:{...it.p},n:{...it.p,...pt},it,pt}});
+ await wr(ops);ops.forEach(o=>{Object.assign(o.it.p,o.pt);if('del' in o.pt)Object.values(PG).forEach(P=>{if(P.rows)P.rows=P.rows.filter(r=>r.id!==o.it.p.id)})});draw();
+ return await hist(kind,txt,m||(its[0]&&its[0].p.m),{items:ops.map(o=>({pid:o.it.p.id,b:patchOf(o.p,o.pt)})),...(extra||{})})}catch(e){console.error(e);toast('تعذر الحفظ')}}
+async function undo(h){if(!h||h.undone)return;try{
+ const ids=[...new Set([...(h.items||[]).map(i=>i.pid),...(h.add||[])])],cur=await getMany(ids),ops=[];
+ (h.items||[]).forEach(it=>{const c=cur[it.pid];if(c)ops.push({p:c,n:{...c,...it.b}})});
+ (h.add||[]).forEach(id=>{const c=cur[id];if(c)ops.push({p:c,n:{...c,del:true,delAt:Date.now(),delBy:ME.name}})});
+ await wr(ops);const ai=h.ai||[];for(let i=0;i<ai.length;i+=400){const b=DB.batch();ai.slice(i,i+400).forEach(id=>b.delete(DB.doc('ai/'+id)));await ack(b.commit())}
+ if(h.aic){const ng={};Object.keys(h.aic).forEach(k=>ng[k]=-h.aic[k]);await stAdd(ng)}
  if(isM())await set('hist',{...h,undone:true,undoneBy:ME.name,undoneAt:Date.now()});else await set('hist',{id:uid('h'),t:Date.now(),by:ME.u,byName:ME.name,kind:'undo',txt:'تراجع عن: '+h.txt,m:h.m||'',items:[],undone:true});
- ev('تراجع عن: '+h.txt);toast('تم التراجع')}
-async function backupJSON(){dl('takaful-backup-'+today()+'.json',new Blob([JSON.stringify({v:1,t:new Date().toISOString(),pp:[...D.pp,...D.tr],ai:D.ai,hist:D.hist,cf:CF})],{type:'application/json'}));set('cf',{id:'main',...CF,lastBackup:today()});toast('تم تنزيل النسخة الكاملة')}
+ ev('تراجع عن: '+h.txt);PG={};draw();toast('تم التراجع')}catch(e){console.error(e);toast('تعذر التراجع')}}
+async function backupJSON(){try{const pp=await loadAll(()=>DB.collection('pp')),ai=await scan(()=>DB.collection('ai')),st=(await DB.doc('st/main').get(GO())).data()||{};
+ dl('takaful-backup-'+today()+'.json',new Blob([JSON.stringify({v:2,t:new Date().toISOString(),pp,ai,st,cf:CF})],{type:'application/json'}));set('cf',{id:'main',...CF,lastBackup:today()});toast('تم تنزيل النسخة الكاملة ('+pp.length+' أسرة)')}catch(e){toast('تعذر أخذ النسخة')}}
 function restoreJSON(f){const r=new FileReader();r.onload=async()=>{try{const o=JSON.parse(r.result);if(!o.pp)throw 0;if(!confirm('سيتم استرجاع '+o.pp.length+' أسرة من النسخة (الحالية بتنكتب فوقها). المتابعة؟'))return;
- const ops=[...o.pp.map(x=>['pp',x]),...(o.ai||[]).map(x=>['ai',x])];for(let i=0;i<ops.length;i+=400){const b=DB.batch();ops.slice(i,i+400).forEach(([c,x])=>b.set(DB.doc(c+'/'+x.id),x));await b.commit()}
- ev('استرجاع نسخة احتياطية ('+o.pp.length+' أسرة)');toast('تم الاسترجاع')}catch(e){toast('ملف غير صالح أو تعذر الاسترجاع')}};r.readAsText(f)}
+ const ops=[...o.pp.map(x=>['pp',x]),...(o.ai||[]).map(x=>['ai',x])];for(let i=0;i<ops.length;i+=400){const b=DB.batch();ops.slice(i,i+400).forEach(([c,x])=>b.set(DB.doc(c+'/'+x.id),x));await ack(b.commit());toast('تم '+Math.min(i+400,ops.length)+' / '+ops.length)}
+ if(o.st)await ack(DB.doc('st/main').set(o.st));PG={};ev('استرجاع نسخة احتياطية ('+o.pp.length+' أسرة)');toast('تم الاسترجاع');draw()}catch(e){toast('ملف غير صالح أو تعذر الاسترجاع')}};r.readAsText(f)}
+async function prepOffline(){if(!navigator.onLine)return toast('لازم تكون متصل لتجهيز الجهاز');if(!confirm('سيتم تحميل بيانات '+(all()?'كل المساجد':'مسجدك')+' على هذا الجهاز ليعمل بدون إنترنت (يستهلك قراءات بعدد السجلات). المتابعة؟'))return;
+ try{const m=all()?null:ME.m,c=n=>toast('تم تحميل '+n),a=await scan(()=>m?DB.collection('pp').where('m','==',m):DB.collection('pp'),1000,c),b=await scan(()=>m?DB.collection('ai').where('m','==',m):DB.collection('ai'),1000,c);toast('الجهاز جاهز للعمل بدون إنترنت ('+a.length+' أسرة) ✓')}catch(e){console.error(e);toast('تعذر التجهيز')}}
+async function recount(){if(!confirm('سيتم فحص كل السجلات وإعادة بناء الإحصائيات (يستهلك قراءات بعدد السجلات). المتابعة؟'))return;try{
+ const all_=await scan(()=>DB.collection('pp'),1000,c=>toast('تم فحص '+c)),acc={},fix=[];
+ all_.forEach(p=>{const n={...p,del:!!p.del,got:!!(p.got||p.last),nom:!!p.nom,prio:p.prio||'عادية'};if(!Array.isArray(p.kw))n.kw=kws(p);if(p.del!==n.del||p.got!==n.got||p.nom!==n.nom||p.prio!==n.prio||n.kw!==p.kw)fix.push(n);mrg(acc,cnt(n))});
+ for(let i=0;i<fix.length;i+=400){const b=DB.batch();fix.slice(i,i+400).forEach(x=>b.set(DB.doc('pp/'+x.id),x));await ack(b.commit())}
+ (await scan(()=>DB.collection('ai'))).forEach(a=>{mrg(acc,{['a_'+a.m+'_'+Math.max(0,AT.indexOf(a.type))]:1})});
+ await ack(DB.doc('st/main').set(acc));PG={};toast('تمت إعادة الحساب ('+all_.length+' أسرة)');draw()}catch(e){console.error(e);toast('تعذر إعادة الحساب')}}
+
 async function xlm(o,name){try{const wb=XLSX.utils.book_new();wb.Workbook={Views:[{RTL:true}]};Object.entries(o).forEach(([k,v])=>XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(v.length?v:[{}]),k));dl(name,new Blob([XLSX.write(wb,{type:'array',bookType:'xlsx'})]))}catch(e){toast('تعذر التصدير')}}
 async function xl(rows,name){try{const ws=XLSX.utils.json_to_sheet(rows),wb=XLSX.utils.book_new();wb.Workbook={Views:[{RTL:true}]};XLSX.utils.book_append_sheet(wb,ws,'البيانات');
  const out=XLSX.write(wb,{type:'array',bookType:'xlsx'});dl(name,new Blob([out]))}catch(e){toast('تعذر التصدير')}}
@@ -219,72 +282,117 @@ document.addEventListener('click',async e=>{const a=e.target.closest('a.sms,[dat
  if(a.matches('a.sms')){const r=SR[a.dataset.k][+a.dataset.i];window.open('sms:'+r.phone+'?body='+encodeURIComponent(smsMsg(a.dataset.k,r)),'_top')}
  else if(a.dataset.cp){try{await navigator.clipboard.writeText(SR[a.dataset.cp].map(r=>r.phone).join('\n'));toast('تم النسخ')}catch(x){toast('تعذر النسخ')}}
  else{try{const k=a.dataset.csv;dl('sms-'+today()+'.csv',new Blob(['\ufeffphone,message\n'+SR[k].map(r=>`"${r.phone}","${smsMsg(k,r).replace(/"/g,'""')}"`).join('\n')],{type:'text/csv'}))}catch(x){}}});
-function vNom(){
- const nl=vis().filter(p=>p.nom).sort((a,b)=>PR.indexOf(a.prio)-PR.indexOf(b.prio)||(+b.fam||0)-(+a.fam||0)),S2=nl.filter(p=>!ex.has(p.id));
- const ms=[...new Set(S2.map(p=>p.m))],mem=D.ac.filter(a=>a.phone&&(a.role!=='member'||ms.includes(a.m)));
- $('#main').innerHTML=`<div class="tools">${mbar()}<label>ترشيح تلقائي لأعلى <input id="an" type="number" min="1" value="10" style="width:70px"></label><button class="btn gold" id="auto">اقتراح</button></div>
- <div class="card"><div class="tools"><b>المرشحون: ${S2.length} من ${nl.length}</b><select id="at">${AT.map(x=>`<option>${x}</option>`).join('')}</select><button class="btn" id="rec">تسجيل الاستلام للمحددين</button><button class="btn alt" id="x1">تصدير ملف الترشيح</button><button class="btn alt" id="px">طباعة</button></div>
- ${nl.length?`<div class="tw"><table><tr><th></th><th>الاسم</th><th>المسجد</th><th>الأفراد</th><th>الأولوية</th></tr>${nl.map(p=>`<tr class="${ex.has(p.id)?'nop':''}"><td><input type="checkbox" data-c="${p.id}" ${ex.has(p.id)?'':'checked'}></td><td>${esc(p.name)}</td><td>${esc(mname(p.m))}</td><td>${p.fam}</td><td>${esc(p.prio)}</td></tr>`).join('')}</table></div>`:'<div class="empty">لا يوجد مرشحون. رشّح من تبويب السكان أو استخدم الترشيح التلقائي.</div>'}</div>
- ${S2.length?smsBox('b','رسالة للمستفيدين المحددين',S2.map(p=>({'الاسم':p.name,phone:p.phone,'المسجد':mname(p.m)})),CF.sms)+smsBox('m','إعلام الأعضاء بالترشيح',mem.map(a=>({'الاسم':a.name,phone:a.phone,'العدد':S2.filter(p=>a.role==='member'?p.m===a.m:true).length})),'السلام عليكم {الاسم}، تم ترشيح {العدد} أسرة للمساعدة، يرجى المراجعة.'):''}`;
- bfm();document.querySelectorAll('[data-c]').forEach(c=>c.onchange=()=>{c.checked?ex.delete(c.dataset.c):ex.add(c.dataset.c);vNom()});
- $('#auto').onclick=()=>{const lim=new Date(Date.now()-30*864e5).toISOString().slice(0,10),n=+$('#an').value||10;
-  const it=vis().filter(p=>!p.nom&&(!p.last||p.last<=lim)).sort((a,b)=>PR.indexOf(a.prio)-PR.indexOf(b.prio)||(+b.fam||0)-(+a.fam||0)).slice(0,n).map(p=>({p,pt:{nom:true}}));if(!it.length)return toast('لا يوجد من يستحق');chg(it,'nom','ترشيح تلقائي لـ '+it.length+' أسرة')};
- $('#px').onclick=()=>window.print();$('#x1').onclick=()=>xl(S2.map(rowOut),'ترشيحات-'+today()+'.xlsx');
- $('#rec').onclick=()=>{if(!S2.length||!confirm('تسجيل استلام '+S2.length+' أسرة؟'))return;const t=$('#at').value;
-  const ids=[],it=S2.map(p=>{const a=uid('a');ids.push(a);set('ai',{id:a,pid:p.id,name:p.name,idno:p.idno,phone:p.phone,m:p.m,type:t,date:today(),by:ME.name});return{p,pt:{nom:false,last:today(),lt:t}}});
-  chg(it,'rec','تسجيل استلام ('+t+') لـ '+S2.length+' أسرة',ms[0],{ai:ids})}}
-function vAid(){
- const L=D.ai.filter(a=>(all()?(fm==='all'||a.m===fm):a.m===ME.m)&&(fa==='all'||a.type===fa)).sort((a,b)=>b.date.localeCompare(a.date));
- $('#main').innerHTML=`<div class="tools">${mbar()}<select id="fa"><option value="all">كل الأنواع</option>${AT.map(x=>`<option ${fa===x?'selected':''}>${x}</option>`).join('')}</select><button class="btn alt" id="xa">تصدير Excel</button><button class="btn alt" id="pa">طباعة</button></div><div class="card tw">${L.length?`<table><tr><th>الاسم</th><th>المسجد</th><th>نوع الاستفادة</th><th>التاريخ</th><th>سجّله</th></tr>${L.map(a=>`<tr><td>${esc(a.name)}</td><td>${esc(mname(a.m))}</td><td><span class="tag ok">${esc(a.type)}</span></td><td>${a.date}</td><td>${esc(a.by)}</td></tr>`).join('')}</table>`:'<div class="empty">لا توجد استفادات مسجلة</div>'}</div>`;
- bfm();$('#fa').onchange=e=>{fa=e.target.value;vAid()};$('#pa').onclick=()=>window.print();$('#xa').onclick=()=>xl(L.map(a=>({'الاسم':a.name,'الهوية':a.idno,'الجوال':a.phone,'المسجد':mname(a.m),'نوع الاستفادة':a.type,'التاريخ':a.date,'سجّله':a.by})),'المستفيدون-'+today()+'.xlsx')}
+const MS=()=>all()?(fm==='all'?CF.mosques:CF.mosques.filter(m=>m.id===fm)):CF.mosques.filter(m=>m.id===ME.m);
+function vAidSec(){const pre=subnav('aid',[['nom','الترشيح'],['ben','المستفيدون'],['stats','إحصائيات المساجد']]);({nom:paneNom,ben:paneBen,stats:paneStats})[sub.aid](pre);bsub()}
+async function autoNom(n){try{let need=n;const its=[];for(const lv of PR){if(need<=0)break;const s=await bq().where('nom','==',false).where('got','==',false).where('prio','==',lv).limit(need).get(GO());s.docs.forEach(d=>its.push({p:d.data(),pt:{nom:true}}));need-=s.size}
+ if(!its.length)return toast('لا يوجد من يستحق (الباقون مرشحون أو استلموا سابقاً)');delete PG.nom;await chg(its,'nom','ترشيح تلقائي لـ '+its.length+' أسرة')}catch(e){console.error(e);const u=(e.message||'').match(/https:\/\/\S+/);if(u&&confirm('هذا الاقتراح يحتاج فهرساً في Firebase (مرة واحدة). فتح الرابط؟'))window.open(u[0].replace(/[.,)]+$/,''));else toast('تعذر الترشيح')}}
+async function recAid(S2,t){try{const ti=Math.max(0,AT.indexOf(t)),ts=Date.now(),ids=[],acc={},docs=S2.map(p=>{const id=uid('a');ids.push(id);const k='a_'+p.m+'_'+ti;acc[k]=(acc[k]||0)+1;return{id,pid:p.id,name:p.name,idno:p.idno,phone:p.phone,m:p.m,type:t,date:today(),ts,by:ME.name}});
+ for(let i=0;i<docs.length;i+=400){const b=DB.batch();docs.slice(i,i+400).forEach(a=>b.set(DB.doc('ai/'+a.id),a));await ack(b.commit())}
+ await stAdd(acc);delete PG.nom;delete PG.ben;await chg(S2.map(p=>({p,pt:{nom:false,got:true,last:today(),lt:t}})),'rec','تسجيل استلام ('+t+') لـ '+S2.length+' أسرة',S2[0].m,{ai:ids,aic:acc})}catch(e){console.error(e);toast('تعذر التسجيل')}}
+function paneNom(pre){
+ const P=pager('nom',JSON.stringify([fm,ME.u]),[()=>bq().where('nom','==',true)]),nl=[...P.rows].sort((a,b)=>PR.indexOf(a.prio)-PR.indexOf(b.prio)||(+b.fam||0)-(+a.fam||0)),S2=nl.filter(p=>!ex.has(p.id)),ms=[...new Set(S2.map(p=>p.m))],mem=D.ac.filter(a=>a.phone&&(a.role!=='member'||ms.includes(a.m)));
+ $('#main').innerHTML=pre+`<div class="tools">${mbar()}<label>ترشيح تلقائي لأعلى <input id="an" type="number" min="1" value="10" style="width:70px"></label><button class="btn gold" id="auto">اقتراح</button><span class="tag">المرشحون حالياً: ${sum(MS(),'n')}</span></div>${errBox(P)}
+ <div class="card"><div class="tools"><b>المحدد: ${S2.length} من ${nl.length}${P.done?'':'+'}</b><select id="at">${AT.map(x=>`<option>${x}</option>`).join('')}</select><button class="btn" id="rec">تسجيل الاستلام للمحددين</button><button class="btn alt" id="x1">تصدير Excel</button><button class="btn alt" id="px">طباعة</button></div>
+ ${nl.length?`<div class="tw"><table><tr><th></th><th>الاسم</th><th>المسجد</th><th>الأفراد</th><th>الأولوية</th></tr>${nl.map(p=>`<tr class="${ex.has(p.id)?'nop':''}"><td><input type="checkbox" data-c="${p.id}" ${ex.has(p.id)?'':'checked'}></td><td>${esc(p.name)}</td><td>${esc(mname(p.m))}</td><td>${p.fam}</td><td>${esc(p.prio)}</td></tr>`).join('')}</table></div>`:(P.busy?'<div class="empty">جاري التحميل…</div>':'<div class="empty">لا يوجد مرشحون. رشّح من قاعدة البيانات أو استخدم الترشيح التلقائي.</div>')}${moreBtn(P)}</div>
+ ${S2.length?smsBox('b','رسالة للمستفيدين المحددين',S2.slice(0,500).map(p=>({'الاسم':p.name,phone:p.phone,'المسجد':mname(p.m)})),CF.sms)+smsBox('m','إعلام الأعضاء بالترشيح',mem.map(a=>({'الاسم':a.name,phone:a.phone,'العدد':S2.filter(p=>a.role==='member'?p.m===a.m:true).length})),'السلام عليكم {الاسم}، تم ترشيح {العدد} أسرة للمساعدة، يرجى المراجعة.'):''}`;
+ bfm();bmore(P);document.querySelectorAll('[data-c]').forEach(c=>c.onchange=()=>{c.checked?ex.delete(c.dataset.c):ex.add(c.dataset.c);draw()});
+ $('#auto').onclick=()=>autoNom(+$('#an').value||10);$('#px').onclick=()=>window.print();$('#x1').onclick=()=>xl(S2.map(rowOut),'ترشيحات-'+today()+'.xlsx');
+ $('#rec').onclick=()=>{if(S2.length&&confirm('تسجيل استلام '+S2.length+' أسرة؟'))recAid(S2,$('#at').value)}}
+function paneBen(pre){
+ const filt=fm!=='all'||!all()||fa!=='all',mk=()=>{let q=DB.collection('ai');if(!all())q=q.where('m','==',ME.m);else if(fm!=='all')q=q.where('m','==',fm);if(fa!=='all')q=q.where('type','==',fa);return filt?q:q.orderBy('ts','desc')};
+ const P=pager('ben',JSON.stringify([fm,fa,ME.u]),[mk]),L=P.rows,M=MS(),tA=AT.reduce((a,t,i)=>a+M.reduce((x,m)=>x+sd('a_'+m.id+'_'+i),0),0);
+ $('#main').innerHTML=pre+`<div class="tools">${mbar()}<select id="fa"><option value="all">كل الأنواع</option>${AT.map(x=>`<option ${fa===x?'selected':''}>${x}</option>`).join('')}</select><button class="btn alt" id="xa">تصدير Excel</button><button class="btn alt" id="pa">طباعة</button><span class="tag">إجمالي الاستفادات: ${tA}</span></div>${errBox(P)}<div class="card tw">${L.length?`<table><tr><th>الاسم</th><th>المسجد</th><th>نوع الاستفادة</th><th>التاريخ</th><th>سجّله</th></tr>${L.map(a=>`<tr><td>${esc(a.name)}</td><td>${esc(mname(a.m))}</td><td><span class="tag ok">${esc(a.type)}</span></td><td>${a.date}</td><td>${esc(a.by)}</td></tr>`).join('')}</table>`:(P.busy?'<div class="empty">جاري التحميل…</div>':'<div class="empty">لا توجد استفادات مسجلة</div>')}${moreBtn(P)}</div>`;
+ bfm();bmore(P);$('#fa').onchange=e=>{fa=e.target.value;draw()};$('#pa').onclick=()=>window.print();
+ $('#xa').onclick=async()=>{try{const r=await loadAll(mk);xl(r.map(a=>({'الاسم':a.name,'الهوية':a.idno,'الجوال':a.phone,'المسجد':mname(a.m),'نوع الاستفادة':a.type,'التاريخ':a.date,'سجّله':a.by})),'المستفيدون-'+today()+'.xlsx')}catch(e){toast('تعذر التصدير')}}}
+function paneStats(pre){
+ const M=MS(),byS={},byA={};ST.forEach((s,i)=>{const v=M.reduce((a,m)=>a+sd('s_'+m.id+'_'+i),0);if(v)byS[s]=v});AT.forEach((t,i)=>{const v=M.reduce((a,m)=>a+sd('a_'+m.id+'_'+i),0);if(v)byA[t]=v});
+ const rows=M.map(m=>({'المسجد':m.name,'الأسر':sd('t_'+m.id),'الأفراد':sd('f_'+m.id),'مرشحون':sd('n_'+m.id),'استلموا':sd('g_'+m.id),'لم يستلموا':sd('t_'+m.id)-sd('g_'+m.id)})),T=sum(M,'t'),G=sum(M,'g'),mx=o=>Math.max(1,...Object.values(o));
+ $('#main').innerHTML=pre+(isM()&&(!CF.lastBackup||Date.now()-new Date(CF.lastBackup)>7*864e5)?'<div class="card" style="border-color:var(--acc)"><div class="tools" style="margin:0"><b>⚠ لم تأخذ نسخة احتياطية منذ أكثر من أسبوع</b><button class="btn gold s" id="bkn">نسخة الآن</button></div></div>':'')+`<div class="tools">${mbar()}<button class="btn alt" id="xr">تصدير Excel</button><button class="btn alt" id="pr">طباعة</button>${isM()?'<button class="btn alt s" id="rc" title="إذا بدت الأرقام غير صحيحة">إعادة حساب الإحصائيات</button>':''}</div>
+ <div class="grid"><div class="kpi big"><span>عدد الأسر</span><div>${T}</div></div><div class="kpi"><span>الأفراد</span><div>${sum(M,'f')}</div></div><div class="kpi"><span>مرشحون حالياً</span><div>${sum(M,'n')}</div></div><div class="kpi"><span>استلموا</span><div>${G}</div></div><div class="kpi"><span>لم يستلموا بعد</span><div>${T-G}</div></div></div>
+ <div class="card tw"><h2>حسب المسجد</h2><table><tr>${Object.keys(rows[0]||{}).map(k=>`<th>${k}</th>`).join('')}</tr>${rows.map(r=>'<tr>'+Object.values(r).map(v=>`<td>${esc(v)}</td>`).join('')+'</tr>').join('')}</table></div>
+ <div class="card"><h2>حسب الحالة</h2>${bars(byS,mx(byS))}</div><div class="card"><h2>حسب نوع الاستفادة</h2>${bars(byA,mx(byA))}</div>`;
+ bfm();const bn=$('#bkn');if(bn)bn.onclick=backupJSON;const rc=$('#rc');if(rc)rc.onclick=recount;$('#xr').onclick=()=>xl(rows,'تقرير-إحصائي-'+today()+'.xlsx');$('#pr').onclick=()=>window.print()}
 function vReq(){
- const L=D.rq.filter(r=>all()||r.by===ME.u).sort((a,b)=>(a.st==='pending'?0:1)-(b.st==='pending'?0:1)||b.t-a.t),cl={pending:'w',ok:'ok',no:'no'},tx={pending:'بانتظار القرار',ok:'مقبول',no:'مرفوض'};
- $('#main').innerHTML=(all()&&!isM()?'<p style="color:var(--mut)">الإداري يشاهد الطلبات فقط، والقبول والرفض للمدير.</p>':'')+(L.length?L.map(r=>`<div class="card"><div class="tools" style="margin:0"><b>طلب ${RT[r.type]}</b><span class="tag">${esc(mname(r.m))}</span><span class="tag ${cl[r.st]}">${tx[r.st]}</span></div><div>${esc(r.pname||'')}</div><small style="color:var(--mut)">${esc(r.byName)} · ${new Date(r.t).toLocaleString('ar')}${r.dec?' · القرار: '+esc(r.dec):''}${r.why?' · السبب: '+esc(r.why):''}</small>${isM()&&r.st==='pending'?`<div class="tools" style="margin:10px 0 0"><button class="btn s" data-a="${r.id}">قبول</button><button class="btn red s" data-r="${r.id}">رفض</button></div>`:''}</div>`).join(''):'<div class="empty">لا توجد طلبات</div>');
- const dc=async(id,ok)=>{const r=D.rq.find(x=>x.id===id);let why='';if(!ok)why=prompt('سبب الرفض (اختياري)')||'';
-  if(ok){if(r.type==='del'){const p=D.pp.find(x=>x.id===r.pid);if(p)chg([{p,pt:{del:true,delAt:Date.now(),delBy:ME.name}}],'del','نقل إلى السلة (اعتماد طلب): '+p.name)}else if(r.type==='imp')addP(r.rows,'اعتماد استيراد '+r.rows.length+' أسرة',r.m);else if(r.type==='add')addP([r.data],'اعتماد إضافة: '+r.data.name,r.m);else{const p=D.pp.find(x=>x.id===r.data.id);if(p){const pt=diffOf(p,r.data);if(Object.keys(pt).length)chg([{p,pt}],'edit','اعتماد تعديل: '+r.data.name)}}}
-  set('rq',{...r,st:ok?'ok':'no',why,dec:ME.name});ev((ok?'اعتماد ':'رفض ')+'طلب '+RT[r.type]+' – '+mname(r.m))};
+ const man=all(),pre=man?subnav('req',[['p','بانتظار القرار'],['h','السجل الكامل']]):'';let L,P=null;
+ if(man&&sub.req==='h'){P=pager('rqh','h',[()=>DB.collection('rq').orderBy('t','desc')]);L=P.rows}else L=[...D.rq].sort((a,b)=>b.t-a.t);
+ const cl={pending:'w',ok:'ok',no:'no'},tx={pending:'بانتظار القرار',ok:'مقبول',no:'مرفوض'};
+ $('#main').innerHTML=pre+(man&&!isM()?'<p style="color:var(--mut)">الإداري يشاهد الطلبات فقط، والقبول والرفض للمدير.</p>':'')+(L.length?L.map(r=>`<div class="card"><div class="tools" style="margin:0"><b>طلب ${RT[r.type]}</b><span class="tag">${esc(mname(r.m))}</span><span class="tag ${cl[r.st]}">${tx[r.st]}</span></div><div>${esc(r.pname||'')}</div><small style="color:var(--mut)">${esc(r.byName)} · ${new Date(r.t).toLocaleString('ar')}${r.dec?' · القرار: '+esc(r.dec):''}${r.why?' · السبب: '+esc(r.why):''}</small>${isM()&&r.st==='pending'?`<div class="tools" style="margin:10px 0 0"><button class="btn s" data-a="${r.id}">قبول</button><button class="btn red s" data-r="${r.id}">رفض</button></div>`:''}</div>`).join(''):'<div class="empty">لا توجد طلبات</div>')+(P?errBox(P)+moreBtn(P):'');
+ bsub();if(P)bmore(P);
+ const dc=async(id,ok)=>{const r=D.rq.find(x=>x.id===id)||(PG.rqh&&PG.rqh.rows.find(x=>x.id===id));if(!r)return;let why='';if(!ok)why=prompt('سبب الرفض (اختياري)')||'';
+  try{if(ok){if(r.type==='del'){const s=await DB.doc('pp/'+r.pid).get(GO());if(s.exists)await chg([{p:s.data(),pt:{del:true,delAt:Date.now(),delBy:ME.name}}],'del','نقل إلى السلة (اعتماد طلب): '+r.pname)}
+   else if(r.type==='imp')await addP(r.rows,'اعتماد استيراد '+r.rows.length+' أسرة',r.m);
+   else if(r.type==='add')await addP([r.data],'اعتماد إضافة: '+r.pname,r.m);
+   else{const s=await DB.doc('pp/'+r.pid).get(GO());if(s.exists){const p=s.data(),pt={};IDK.forEach(k=>{if(k!=='kw'&&String(r.data[k]==null?'':r.data[k])!==String(p[k]==null?'':p[k]))pt[k]=r.data[k]});if(Object.keys(pt).length)await chg([{p,pt}],'edit','اعتماد تعديل: '+r.pname)}}}
+  await set('rq',{...r,st:ok?'ok':'no',why,dec:ME.name,dt:Date.now()});ev((ok?'اعتماد ':'رفض ')+'طلب '+RT[r.type]+' – '+mname(r.m));if(PG.rqh)PG.rqh.rows=PG.rqh.rows.map(x=>x.id===r.id?{...x,st:ok?'ok':'no',dec:ME.name}:x);draw()}catch(e){console.error(e);toast('تعذر تنفيذ القرار')}};
  document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>dc(b.dataset.a,1));document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>dc(b.dataset.r,0))}
-function vUsr(){
- $('#main').innerHTML=`<div class="card"><h2>إنشاء حساب</h2><div class="f"><label>الاسم<input id="u_n"></label><label>الجوال<input id="u_t" inputmode="tel"></label><label>اسم المستخدم (إنجليزي)<input id="u_u" dir="ltr"></label><label>كلمة المرور<input id="u_p"></label><label>الصلاحية<select id="u_r"><option value="member">عضو</option>${isM()?'<option value="admin">إداري</option>':''}</select></label><label>المسجد (للعضو)<select id="u_m">${mopts('')}</select></label></div><div class="tools" style="margin-top:12px"><button class="btn" id="u_ok">إنشاء</button></div></div>
+function vRep(){
+ $('#main').innerHTML=`<div class="card"><h2>تقرير إحصائي للمساجد</h2><p style="margin:0 0 10px;color:var(--mut)">الأسر والأفراد والمرشحون والمستلمون لكل مسجد.</p><div class="tools" style="margin:0"><button class="btn" id="r1">تصدير Excel</button><button class="btn alt" id="r1p">عرض وطباعة</button></div></div>
+ <div class="card"><h2>تقرير المستفيدين</h2><div class="tools">${mbar()}<select id="rt"><option value="all">كل الأنواع</option>${AT.map(x=>`<option>${x}</option>`).join('')}</select><label>من <input id="rf1" type="date"></label><label>إلى <input id="rf2" type="date"></label><button class="btn" id="r2">تصدير Excel</button></div></div>
+ <div class="card"><h2>كشف السكان</h2><p style="margin:0 0 10px;color:var(--mut)">كل أسر المسجد المحدد أعلاه (أو كل المساجد).</p><button class="btn" id="r3">تصدير Excel</button></div>`;
+ bfm();const M=MS();
+ $('#r1').onclick=()=>xl(M.map(m=>({'المسجد':m.name,'الأسر':sd('t_'+m.id),'الأفراد':sd('f_'+m.id),'مرشحون':sd('n_'+m.id),'استلموا':sd('g_'+m.id),'لم يستلموا':sd('t_'+m.id)-sd('g_'+m.id)})),'تقرير-إحصائي-'+today()+'.xlsx');
+ $('#r1p').onclick=()=>{tab='aid';sub.aid='stats';draw();setTimeout(()=>window.print(),300)};
+ $('#r2').onclick=async()=>{const t=$('#rt').value,f1=$('#rf1').value,f2=$('#rf2').value;try{const r=await loadAll(()=>{let q=DB.collection('ai');if(!all())q=q.where('m','==',ME.m);else if(fm!=='all')q=q.where('m','==',fm);if(t!=='all')q=q.where('type','==',t);return q},a=>(!f1||a.date>=f1)&&(!f2||a.date<=f2));xl(r.map(a=>({'الاسم':a.name,'الهوية':a.idno,'الجوال':a.phone,'المسجد':mname(a.m),'نوع الاستفادة':a.type,'التاريخ':a.date,'سجّله':a.by})),'تقرير-المستفيدين-'+today()+'.xlsx')}catch(e){toast('تعذر التصدير')}};
+ $('#r3').onclick=async()=>{if(!confirm('سيتم تحميل السجلات وتصديرها (يستهلك قراءات). المتابعة؟'))return;try{xl((await loadAll(bq)).map(rowOut),'كشف-السكان-'+today()+'.xlsx')}catch(e){toast('تعذر التصدير')}}}
+function vBin(){
+ const pre=subnav('bin',[['trash','سلة المهملات'],['hist','سجل التراجع']]);
+ if(sub.bin==='trash'){const P=pager('trash','t',[()=>DB.collection('pp').where('del','==',true)]),L=P.rows;
+  $('#main').innerHTML=pre+`<div class="tools"><b>سلة المهملات</b>${L.length?'<button class="btn red s" id="te">إفراغ السلة نهائياً</button>':''}</div>${errBox(P)}<div class="card tw">${L.length?`<table><tr><th>الاسم</th><th>المسجد</th><th>الهوية</th><th>حذفه</th><th>التاريخ</th><th></th></tr>${L.map(p=>`<tr><td>${esc(p.name)}</td><td>${esc(mname(p.m))}</td><td>${esc(p.idno)}</td><td>${esc(p.delBy||'')}</td><td>${p.delAt?new Date(p.delAt).toLocaleDateString('ar'):''}</td><td><button class="btn s" data-r="${p.id}">استرجاع</button> <button class="btn red s" data-f="${p.id}">حذف نهائي</button></td></tr>`).join('')}</table>`:(P.busy?'<div class="empty">جاري التحميل…</div>':'<div class="empty">السلة فارغة</div>')}${moreBtn(P)}</div>`;
+  bsub();bmore(P);
+  document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{const p=L.find(x=>x.id===b.dataset.r);if(p)chg([{p,pt:{del:false}}],'restore','استرجاع من السلة: '+p.name)});
+  document.querySelectorAll('[data-f]').forEach(b=>b.onclick=async()=>{const p=L.find(x=>x.id===b.dataset.f);if(p&&confirm('حذف '+p.name+' نهائياً؟ لا يمكن التراجع.')){await wr([{p,n:null}]);P.rows=P.rows.filter(x=>x.id!==p.id);ev('حذف نهائي: '+p.name);draw()}});
+  const te=$('#te');if(te)te.onclick=async()=>{if(!confirm('حذف كل أسر السلة نهائياً؟ لا يمكن التراجع.'))return;try{const r=await loadAll(()=>DB.collection('pp').where('del','==',true));await wr(r.map(p=>({p,n:null})));ev('إفراغ سلة المهملات ('+r.length+')');PG={};draw()}catch(e){toast('تعذر الإفراغ')}}}
+ else{const P=pager('hist','h',[()=>DB.collection('hist').orderBy('t','desc')]),L=P.rows;
+  $('#main').innerHTML=pre+'<p style="color:var(--mut)">كل تغيير بيتسجل هون، وبتقدر تتراجع عنه بضغطة.</p>'+errBox(P)+(L.length?L.map(h=>`<div class="log"><b>${esc(h.txt)}</b> <span class="tag">${esc(mname(h.m))}</span>${h.undone?' <span class="tag no">تم التراجع</span>':''}<br><small>${esc(h.byName)} · ${new Date(h.t).toLocaleString('ar')}</small>${h.undone||h.kind==='undo'?'':`<div class="tools" style="margin:8px 0 0"><button class="btn alt s" data-u="${h.id}">تراجع عن هذه الخطوة</button></div>`}</div>`).join(''):(P.busy?'<div class="empty">جاري التحميل…</div>':'<div class="empty">لا توجد تغييرات</div>'))+moreBtn(P);
+  bsub();bmore(P);document.querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>{if(confirm('التراجع عن هذه الخطوة؟'))undo(L.find(x=>x.id===b.dataset.u))})}}
+function vEv(){
+ if(!isM()){try{localStorage.setItem('ns_'+ME.u,Date.now())}catch(e){}const L=D.rq.filter(r=>r.st!=='pending').sort((a,b)=>(b.dt||0)-(a.dt||0));
+  $('#main').innerHTML='<p style="color:var(--mut)">قرارات المدير على طلباتك.</p>'+(L.length?L.map(r=>`<div class="log"><b>طلب ${RT[r.type]}: ${esc(r.pname||'')}</b> <span class="tag ${r.st==='ok'?'ok':'no'}">${r.st==='ok'?'مقبول':'مرفوض'}</span>${r.why?'<br>السبب: '+esc(r.why):''}<br><small>${r.dt?new Date(r.dt).toLocaleString('ar'):''}</small></div>`).join(''):'<div class="empty">لا توجد إشعارات</div>');return}
+ const P=pager('ev','e',[()=>DB.collection('ev').orderBy('t','desc')]),L=P.rows;
+ $('#main').innerHTML=`<div class="tools"><b>الإشعارات (${D.ev.length>=100?'100+':D.ev.length} غير مقروءة)</b><button class="btn alt" id="sn">تحديد الكل كمقروء</button></div>${errBox(P)}`+(L.length?L.map(e=>`<div class="log ${e.seen?'':'new'}">${esc(e.txt)}<br><small>${esc(e.by)} · ${new Date(e.t).toLocaleString('ar')}</small></div>`).join(''):(P.busy?'<div class="empty">جاري التحميل…</div>':'<div class="empty">لا توجد إشعارات</div>'))+moreBtn(P);
+ bmore(P);$('#sn').onclick=async()=>{try{const b=DB.batch();D.ev.forEach(e=>b.update(DB.doc('ev/'+e.id),{seen:true}));await ack(b.commit());P.rows.forEach(e=>e.seen=true);draw()}catch(e){toast('تعذر التحديد')}}}
+function vUsr(pre){
+ $('#main').innerHTML=pre+`<div class="card"><h2>إنشاء حساب</h2><div class="f"><label>الاسم<input id="u_n"></label><label>الجوال<input id="u_t" inputmode="tel"></label><label>اسم المستخدم (إنجليزي)<input id="u_u" dir="ltr"></label><label>كلمة المرور<input id="u_p"></label><label>الصلاحية<select id="u_r"><option value="member">عضو</option>${isM()?'<option value="admin">إداري</option>':''}</select></label><label>المسجد (للعضو)<select id="u_m">${mopts('')}</select></label></div><div class="tools" style="margin-top:12px"><button class="btn" id="u_ok">إنشاء</button></div></div>
  <div class="card tw"><h2>الحسابات</h2><table><tr><th>الاسم</th><th>المستخدم</th><th>الصلاحية</th><th>المسجد</th><th>الجوال</th><th></th></tr>${D.ac.map(a=>`<tr><td>${esc(a.name)}</td><td dir="ltr">${esc(a.u)}</td><td>${RN[a.role]}</td><td>${a.role==='member'?esc(mname(a.m)):'—'}</td><td>${esc(a.phone)}</td><td>${isM()&&a.u!==ME.u?`<button class="btn red s" data-x="${a.u}">حذف</button>`:''}</td></tr>`).join('')}</table></div>`;
  $('#u_ok').onclick=async()=>{const u=$('#u_u').value.trim().toLowerCase(),p=$('#u_p').value,n=$('#u_n').value.trim(),role=$('#u_r').value;if(!/^[a-z0-9_.-]{3,}$/.test(u)||p.length<6||!n)return toast('أكمل البيانات (كلمة المرور 6 أحرف على الأقل)');
   try{await mkAcct({u,pw:p,name:n,phone:$('#u_t').value.trim(),role,m:role==='member'?$('#u_m').value:''});ev('إنشاء حساب '+RN[role]+': '+n);toast('تم إنشاء الحساب')}catch(e){toast(e.code==='auth/email-already-in-use'?'اسم المستخدم مستخدم سابقاً':'تعذر الإنشاء')}};
  document.querySelectorAll('[data-x]').forEach(b=>b.onclick=()=>{const a=D.ac.find(x=>x.u===b.dataset.x);if(confirm('حذف حساب '+a.name+'؟ لا يمكن إعادة استخدام اسم المستخدم.')){del('ac',a.u);ev('حذف حساب '+a.name)}})}
-function vHist(){const L=[...D.hist].sort((a,b)=>b.t-a.t).slice(0,200);
- $('#main').innerHTML='<p style="color:var(--mut)">كل تغيير بيتسجل هون، وبتقدر تتراجع عنه بضغطة.</p>'+(L.length?L.map(h=>`<div class="log"><b>${esc(h.txt)}</b> <span class="tag">${esc(mname(h.m))}</span>${h.undone?' <span class="tag no">تم التراجع</span>':''}<br><small>${esc(h.byName)} · ${new Date(h.t).toLocaleString('ar')}</small>${h.undone||h.kind==='undo'?'':`<div class="tools" style="margin:8px 0 0"><button class="btn alt s" data-u="${h.id}">تراجع عن هذه الخطوة</button></div>`}</div>`).join(''):'<div class="empty">لا توجد تغييرات</div>');
- document.querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>{if(confirm('التراجع عن هذه الخطوة؟'))undo(D.hist.find(x=>x.id===b.dataset.u))})}
-function vTrash(){const L=[...D.tr].sort((a,b)=>(b.delAt||0)-(a.delAt||0));
- $('#main').innerHTML=`<div class="tools"><b>سلة المهملات (${L.length})</b>${L.length?'<button class="btn red s" id="te">إفراغ السلة نهائياً</button>':''}</div><div class="card tw">${L.length?`<table><tr><th>الاسم</th><th>المسجد</th><th>الهوية</th><th>حذفه</th><th>التاريخ</th><th></th></tr>${L.map(p=>`<tr><td>${esc(p.name)}</td><td>${esc(mname(p.m))}</td><td>${esc(p.idno)}</td><td>${esc(p.delBy||'')}</td><td>${p.delAt?new Date(p.delAt).toLocaleDateString('ar'):''}</td><td><button class="btn s" data-r="${p.id}">استرجاع</button> <button class="btn red s" data-f="${p.id}">حذف نهائي</button></td></tr>`).join('')}</table>`:'<div class="empty">السلة فارغة</div>'}</div>`;
- document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{const p=D.tr.find(x=>x.id===b.dataset.r);if(p)chg([{p,pt:{del:false}}],'restore','استرجاع من السلة: '+p.name)});
- document.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{const p=D.tr.find(x=>x.id===b.dataset.f);if(p&&confirm('حذف '+p.name+' نهائياً؟ لا يمكن التراجع.')){del('pp',p.id);ev('حذف نهائي: '+p.name)}});
- const te=$('#te');if(te)te.onclick=()=>{if(confirm('حذف '+L.length+' أسرة نهائياً؟ لا يمكن التراجع.')){L.forEach(p=>del('pp',p.id));ev('إفراغ سلة المهملات ('+L.length+')')}}}
-function vEv(){const L=[...D.ev].sort((a,b)=>b.t-a.t).slice(0,150);
- $('#main').innerHTML=`<div class="tools"><b>سجل الأحداث والتعديلات</b><button class="btn alt" id="sn">تحديد الكل كمقروء</button></div>`+(L.length?L.map(e=>`<div class="log ${e.seen?'':'new'}">${esc(e.txt)}<br><small>${esc(e.by)} · ${new Date(e.t).toLocaleString('ar')}</small></div>`).join(''):'<div class="empty">لا توجد أحداث</div>');
- $('#sn').onclick=()=>D.ev.filter(e=>!e.seen).forEach(e=>set('ev',{...e,seen:true}))}
+
 function vSet(){
- $('#main').innerHTML=`<div class="card"><h2>المساجد</h2>${CF.mosques.map(m=>`<div class="tools"><input data-r="${m.id}" value="${esc(m.name)}" style="flex:1"><span class="tag">${D.pp.filter(p=>p.m===m.id).length} أسرة</span></div>`).join('')}</div>
- <div class="card"><h2>نص رسالة المستفيدين</h2><textarea id="sm" rows="3" style="width:100%">${esc(CF.sms)}</textarea><small>المتغيرات: {الاسم} {المسجد}</small><div class="tools" style="margin-top:8px"><button class="btn" id="ss">حفظ</button></div></div><div class="card"><h2>النسخ الاحتياطي</h2><p style="margin:0 0 10px;color:var(--mut)">آخر نسخة: ${CF.lastBackup||'لم تؤخذ بعد'}. النسخة الكاملة فيها السكان والسلة والمستفيدين وبتنفع للاسترجاع.</p><div class="tools" style="margin:0"><button class="btn" id="bj">تنزيل نسخة كاملة</button><button class="btn alt" id="bk">تصدير Excel</button><button class="btn alt" id="rs">استرجاع من نسخة</button></div><input type="file" id="rf" accept=".json" hidden></div>`;
- document.querySelectorAll('[data-r]').forEach(i=>i.onchange=()=>{if(i.value.trim())set('cf',{id:'main',...CF,mosques:CF.mosques.map(m=>m.id===i.dataset.r?{...m,name:i.value.trim()}:m)})});
- $('#ss').onclick=()=>{set('cf',{id:'main',...CF,sms:$('#sm').value});toast('تم الحفظ')};
- $('#bj').onclick=backupJSON;$('#rs').onclick=()=>$('#rf').click();$('#rf').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)restoreJSON(f)};$('#bk').onclick=()=>xlm({'السكان':D.pp.map(rowOut),'المستفيدون':D.ai.map(a=>({'الاسم':a.name,'الهوية':a.idno,'المسجد':mname(a.m),'النوع':a.type,'التاريخ':a.date}))},'نسخة-احتياطية-'+today()+'.xlsx')}
+ const subs=isM()?[['users','الحسابات'],['cfg','المساجد والرسائل'],['bk','النسخ الاحتياطي']]:[['users','الحسابات']];if(!subs.find(x=>x[0]===sub.set))sub.set='users';const pre=subnav('set',subs);
+ if(sub.set==='users')vUsr(pre);
+ else if(sub.set==='cfg'){
+  $('#main').innerHTML=pre+`<div class="card"><h2>المساجد</h2>${CF.mosques.map(m=>`<div class="tools"><input data-r="${m.id}" value="${esc(m.name)}" style="flex:1"><span class="tag">${sd('t_'+m.id)} أسرة</span></div>`).join('')}</div>
+  <div class="card"><h2>نص رسالة المستفيدين</h2><textarea id="sm" rows="3" style="width:100%">${esc(CF.sms)}</textarea><small>المتغيرات: {الاسم} {المسجد}</small><div class="tools" style="margin-top:8px"><button class="btn" id="ss">حفظ</button></div></div>`;
+  document.querySelectorAll('[data-r]').forEach(i=>i.onchange=()=>{if(i.value.trim())set('cf',{id:'main',...CF,mosques:CF.mosques.map(m=>m.id===i.dataset.r?{...m,name:i.value.trim()}:m)})});
+  $('#ss').onclick=()=>{set('cf',{id:'main',...CF,sms:$('#sm').value});toast('تم الحفظ')}}
+ else{$('#main').innerHTML=pre+`<div class="card"><h2>النسخ الاحتياطي</h2><p style="margin:0 0 10px;color:var(--mut)">آخر نسخة: ${CF.lastBackup||'لم تؤخذ بعد'}. النسخة الكاملة فيها السكان والسلة والمستفيدين والإحصائيات، وبتنفع للاسترجاع.</p><div class="tools" style="margin:0"><button class="btn" id="bj">تنزيل نسخة كاملة</button><button class="btn alt" id="rs">استرجاع من نسخة</button></div><input type="file" id="rf" accept=".json" hidden></div>
+  <div class="card"><h2>صيانة البيانات</h2><p style="margin:0 0 10px;color:var(--mut)">فحص كل السجلات، وإصلاح الحقول، وإعادة بناء الإحصائيات. استخدمه بعد أي استرجاع أو إذا بدت الأرقام غير صحيحة، وبعد نقل بيانات من نسخة قديمة.</p><button class="btn alt" id="rc">فحص وإعادة بناء الإحصائيات</button></div>`;
+  $('#bj').onclick=backupJSON;$('#rs').onclick=()=>$('#rf').click();$('#rf').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)restoreJSON(f)};$('#rc').onclick=recount}
+ bsub()}
+
 let AU,UN=[];const ld=u=>new Promise((r,j)=>{const e=document.createElement('script');e.src=u;e.onload=r;e.onerror=j;document.head.appendChild(e)});
 async function libs(){for(const b of ['https://www.gstatic.com/firebasejs/10.12.2/','https://cdn.jsdelivr.net/npm/firebase@10.12.2/','https://unpkg.com/firebase@10.12.2/']){try{for(const n of ['app','auth','firestore'])await ld(b+'firebase-'+n+'-compat.js');if(window.firebase)return true}catch(e){}}return false}
-const on=(q,c)=>UN.push(q.onSnapshot(s=>{D[c]=s.docs.map(d=>d.data());if(c==='pp'){D.tr=D.pp.filter(p=>p.del);D.pp=D.pp.filter(p=>!p.del)}rdy[c]=1;rd()},e=>{console.error(c,e);toast('تعذر تحميل '+c+': '+(e.code||''))}));
+const on=(q,c,cb)=>UN.push(q.onSnapshot(s=>{if(cb)cb(s);else D[c]=s.docs.map(d=>d.data());rdy[c]=1;rd()},e=>{console.error(c,e);toast('تعذر تحميل '+c+': '+(e.code||''))}));
 async function boot0(){
  if(typeof firebase==='undefined'&&!(await libs())){$('#main').innerHTML='<div class="empty">تعذر تحميل مكتبة Firebase من الإنترنت.<br>افتح الرابط في متصفح Chrome (وليس من داخل تطبيق)، وجرّب شبكة أخرى أو VPN.</div>';return}
  if(typeof XLSX==='undefined')ld('https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js').catch(()=>{});
  firebase.initializeApp(FIREBASE_CONFIG);AU=firebase.auth();DB=firebase.firestore();
- AU.onAuthStateChanged(async u=>{UN.forEach(f=>f());UN=[];ME=null;rdy={};D={pp:[],ac:[],rq:[],ai:[],ev:[],tr:[],hist:[]};$('#hd').innerHTML='';
- if(!u){$('#nav').innerHTML='';login();return}
- const un=u.email.split('@')[0];let a;try{a=(await DB.doc('ac/'+un).get()).data()}catch(e){}
- if(!a){toast('الحساب غير مفعّل');AU.signOut();return}
- ME=a;const C=c=>DB.collection(c),mem=a.role==='member';
- if(mem)UN.push(DB.doc('ac/'+un).onSnapshot(s=>{ME=s.data();D.ac=[ME];rdy.ac=1;rd()}));else on(C('ac'),'ac');
- on(mem?C('pp').where('m','==',a.m):C('pp'),'pp');on(mem?C('ai').where('m','==',a.m):C('ai'),'ai');on(mem?C('rq').where('by','==',un):C('rq'),'rq');
- if(a.role==='manager'){on(C('ev'),'ev');on(C('hist'),'hist')}else rdy.ev=1;
- UN.push(DB.doc('cf/main').onSnapshot(s=>{if(s.exists){const c=s.data();CF={mosques:c.mosques||CF.mosques,sms:c.sms||CF.sms,lastBackup:c.lastBackup||''}}else if(a.role==='manager')set('cf',{id:'main',...CF});rdy.cf=1;rd()},e=>toast('خطأ: '+(e.code||''))));
- draw()})}
-let lastMobile=window.matchMedia('(max-width: 860px)').matches;window.addEventListener('resize',()=>{const now=window.matchMedia('(max-width: 860px)').matches;if(ME&&now!==lastMobile){lastMobile=now;draw()}});
+ DB.settings({cacheSizeBytes:firebase.firestore.CACHE_SIZE_UNLIMITED});try{await DB.enablePersistence({synchronizeTabs:true})}catch(e){console.warn('persistence',e.code)}
+ PEND++;DB.waitForPendingWrites().then(()=>{PEND=Math.max(0,PEND-1);setNet()});
+ window.addEventListener('offline',()=>{setNet();toast('انقطع الاتصال. كمّل شغلك، والتعديلات بتنحفظ وبتنرفع تلقائياً.')});window.addEventListener('online',()=>{setNet();toast('رجع الاتصال، جاري رفع التعديلات…')});
+ AU.onAuthStateChanged(async u=>{UN.forEach(f=>f());UN=[];ME=null;rdy={};PG={};D={ac:[],rq:[],ev:[]};SD={};$('#hd').innerHTML='';
+  if(!u){$('#nav').innerHTML='';login();return}
+  const un=u.email.split('@')[0];let a;try{a=(await DB.doc('ac/'+un).get(GO())).data()}catch(e){}
+  if(!a){if(!navigator.onLine){$('#main').innerHTML='<div class="empty">لا يوجد اتصال بالإنترنت وهذا أول تشغيل على هذا الجهاز.<br>اتصل بالإنترنت مرة واحدة لتجهيزه.</div>';return}toast('الحساب غير مفعّل');AU.signOut();return}
+  ME=a;const C=c=>DB.collection(c),mem=a.role==='member';
+  if(mem)UN.push(DB.doc('ac/'+un).onSnapshot(s=>{ME=s.data();D.ac=[ME];rdy.ac=1;rd()}));else on(C('ac'),'ac');
+  on(mem?C('rq').where('by','==',un).limit(100):C('rq').where('st','==','pending').limit(300),'rq');
+  if(a.role==='manager')on(C('ev').where('seen','==',false).limit(100),'ev');
+  on(DB.doc('st/main'),'st',s=>{SD=s.exists?s.data():{}});
+  UN.push(DB.doc('cf/main').onSnapshot(s=>{if(s.exists){const c=s.data();CF={mosques:c.mosques||CF.mosques,sms:c.sms||CF.sms,lastBackup:c.lastBackup||''}}else if(a.role==='manager')set('cf',{id:'main',...CF});rdy.cf=1;rd()},e=>toast('خطأ: '+(e.code||''))));
+  draw()})}
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 boot0();
 </script>
 </body>
