@@ -100,11 +100,17 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyBJW2FOJMOL5hAmaeEFKgIQvojpXkwcu9g',authDoma
 window.addEventListener('error',e=>{const m=document.getElementById('main');if(m&&/جاري التحميل/.test(m.textContent))m.innerHTML='<div class="empty">حدث خطأ: '+String(e.message||'').replace(/</g,'')+'</div>'});
 setTimeout(()=>{const m=document.getElementById('main');if(m&&/جاري التحميل/.test(m.textContent))m.innerHTML='<div class="empty">تعذر الاتصال بـ Firebase.<br>تأكد من الإنترنت، وجرّب متصفحاً آخر، وأوقف أي VPN أو حاجب إعلانات.<br>إذا استمرت المشكلة تأكد من نشر القواعد (Rules) في Firestore.</div>'},12000);
 const $=s=>document.querySelector(s),esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),today=()=>new Date().toISOString().slice(0,10);
-const RN={manager:'مدير',admin:'إداري',member:'عضو'},ST=['محتاج','أرمل/ة','أيتام','مريض','كبير سن','عادي'],PR=['عالية','متوسطة','عادية'],AT=['كابونة','طرد غذائي','مساعدة نقدية','بطانيات','أخرى'],RT={add:'إضافة',edit:'تعديل',del:'حذف',imp:'استيراد'};
+const RN={manager:'مدير',admin:'إداري',member:'عضو'},ST=['محتاج','أرمل/ة','أيتام','مريض','كبير سن','عادي'],PR=['عالية','متوسطة','عادية'],RT={add:'إضافة',edit:'تعديل',del:'حذف',imp:'استيراد'};
 const MN=['الأول','الثاني','الثالث','الرابع','الخامس','السادس'];
 let DB,ME=null,D={ac:[],rq:[],ev:[]},rdy={},tab='home',fm='all',fa='all',q='',ex=new Set(),SR={},fs='all',fv='all',PG={},SD={},FQ=false;
 let CF={mosques:MN.map((n,i)=>({id:'m'+(i+1),name:'المسجد '+n})),sms:'السلام عليكم {الاسم}، تم ترشيحكم لاستلام مساعدة من لجنة الإغاثة. نرجو مراجعة المسجد.'};
+let AT=['كابونة','طرد غذائي','مساعدة نقدية','بطانيات','أخرى','وجبة'];
 const IC={db:'<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5"/><path d="M3 12c0 1.7 4 3 9 3s9-1.3 9-3"/>',rep:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/>',bin:'<path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/>',hist:'<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>',trash:'<path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/>',stats:'<path d="M3 3v18h18"/><path d="M7 15v3M12 9v9M17 5v13"/>',people:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',nom:'<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/>',aid:'<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>',req:'<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',usr:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/>',ev:'<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',set:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>'};
+const DEFAID=[{n:'كابونة',p:2,off:false},{n:'طرد غذائي',p:3,off:false},{n:'مساعدة نقدية',p:4,off:false},{n:'بطانيات',p:2,off:false},{n:'أخرى',p:1,off:false},{n:'وجبة',p:1,off:false}];
+const APT=t=>{const i=AT.indexOf(t);return i>=0&&CF.aid&&CF.aid[i]?(+CF.aid[i].p||0):1};
+const actTypes=()=>AT.filter((t,i)=>!(CF.aid&&CF.aid[i]&&CF.aid[i].off));
+
+CF.aid=DEFAID;CF.plan={total:0,shares:{}};
 const mname=id=>(CF.mosques.find(m=>m.id===id)||{name:'—'}).name,isM=()=>ME.role==='manager',all=()=>ME.role!=='member';
 const toast=t=>{const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>e.style.display='none',2800)};
 function toastU(t,fn){const e=$('#toast');e.innerHTML=esc(t)+' <button class="btn gold s" id="ut" style="margin-inline-start:10px">تراجع</button>';e.style.display='block';$('#ut').onclick=()=>{e.style.display='none';fn()};clearTimeout(toast.h);toast.h=setTimeout(()=>e.style.display='none',9000)}
@@ -127,7 +133,7 @@ function bfm(){const e=$('#fm');if(e)e.onchange=()=>{fm=e.value;draw()}}
 function closeMore(){const m=$('#moreMenu'),s=$('#menuShade'),b=$('#moreBtn');if(m)m.hidden=true;if(s)s.hidden=true;if(b)b.setAttribute('aria-expanded','false')}
 const HOME={db:['قاعدة البيانات','إضافة وتعديل وحذف واستيراد وتصدير بيانات السكان','#0f6b57'],aid:['إدارة المساعدات','ترشيح الأسماء والمستفيدون وإحصائيات المساجد','#e08a1e'],req:['طلبات الاعتماد','طلبات الإضافة والتعديل والحذف بانتظار القرار','#3b6fd4'],rep:['التقارير','تقارير إحصائية وتقارير المستفيدين بصيغة Excel','#7a4fd0'],set:['الإعدادات','الحسابات وكلمة المرور والسلة والنسخ الاحتياطي','#475467']};
 const SHORT={db:'البيانات',aid:'المساعدات',req:'الطلبات',rep:'التقارير',set:'الإعدادات'};
-const setItems=()=>{const a=[];if(all())a.push(['users','الحسابات']);a.push(['pw','كلمة المرور']);if(isM())a.push(['data','إدارة قاعدة البيانات'],['cfg','المساجد والرسائل'],['trash','سلة المهملات'],['hist','سجل التراجع'],['bk','النسخ الاحتياطي']);return a};
+const setItems=()=>{const a=[];if(all())a.push(['users','الحسابات']);a.push(['pw','كلمة المرور']);if(isM())a.push(['pts','أنواع الاستفادة والنقاط'],['data','إدارة قاعدة البيانات'],['cfg','المساجد والرسائل'],['trash','سلة المهملات'],['hist','سجل التراجع'],['bk','النسخ الاحتياطي']);return a};
 function subsOf(t){if(t==='aid')return['aid',[['nom','الترشيح'],['ben','المستفيدون'],['stats','إحصائيات المساجد']]];if(t==='req'&&all())return['req',[['p','بانتظار القرار'],['h','السجل الكامل']]];if(t==='set'){const it=setItems();if(!it.find(x=>x[0]===sub.set))sub.set=it[0][0];return['set',it]}return null}
 function vHome(){
  const M=all()?CF.mosques:CF.mosques.filter(m=>m.id===ME.m),pe=isM()?D.rq.length:D.rq.filter(r=>r.st==='pending').length;
@@ -193,7 +199,7 @@ function bq(){let q=DB.collection('pp').where('del','==',false);if(!all())q=q.wh
 function pq(){let q=bq();if(fs!=='all')q=q.where('status','==',fs);if(fv==='nom')q=q.where('nom','==',true);else if(fv==='got')q=q.where('got','==',true);else if(fv==='no')q=q.where('got','==',false);return q}
 function sq(w){let q=DB.collection('pp');if(!all())q=q.where('m','==',ME.m);else if(fm!=='all')q=q.where('m','==',fm);return q.where('kw','array-contains',w)}
 const rowOut=p=>({'رقم الهوية':p.idno,'الاسم رباعي':p.name,'عدد الأفراد':p.fam,'رقم الجوال':p.phone,'المسجد':mname(p.m),'الحالة الاجتماعية':p.marital||'','رقم هوية الزوجة':p.wid||'','اسم الزوجة رباعي':p.wname||'','الحالة':p.status,'الأولوية':p.prio,'ملاحظات':p.note||'','آخر استلام':p.last||'','نوع آخر استفادة':p.lt||''});
-const mkP=o=>{const p={id:idOk(o.idno)?String(o.idno):uid('p'),name:o.name,idno:o.idno||'',phone:o.phone||'',fam:+o.fam||1,marital:o.marital||'',wid:o.wid||'',wname:o.wname||'',m:o.m,status:o.status||'محتاج',prio:o.prio||'عادية',note:o.note||'',nom:false,got:false,last:'',lt:'',del:false};p.kw=kws(p);return p};
+const mkP=o=>{const p={id:idOk(o.idno)?String(o.idno):uid('p'),name:o.name,idno:o.idno||'',phone:o.phone||'',fam:+o.fam||1,marital:o.marital||'',wid:o.wid||'',wname:o.wname||'',m:o.m,status:o.status||'محتاج',prio:o.prio||'عادية',note:o.note||'',nom:false,got:false,last:'',lt:'',pts:0,del:false};p.kw=kws(p);return p};
 const IDK=['name','idno','phone','fam','marital','wid','wname','m','status','note','kw'];
 const sub={db:'list',aid:'nom',bin:'trash',set:'users',req:'p'};
 const subnav=(k,items)=>`<div class="seg">${items.map(([v,l])=>`<button class="${sub[k]===v?'on':''}" data-sub="${k}:${v}">${l}</button>`).join('')}</div>`;
@@ -207,7 +213,7 @@ const cardHtml=p=>{const op=OPEN===p.id,h=AH[p.id];
  return`<div class="rc ${op?'open':''}"><div class="rch" data-o="${p.id}"><div class="rci"><div><b class="rcn">${esc(p.name)}</b> <button class="pen" data-e="${p.id}" aria-label="تعديل">✎</button> ${p.nom?'<span class="tag w">مرشّح</span>':''} ${p.got?'<span class="tag ok">استلم</span>':''}</div><div class="rcm">رقم الهوية: <b>${esc(p.idno||'—')}</b> · الجوال: <b>${esc(p.phone||'—')}</b></div></div><div class="rcb">${esc(p.fam)}<small>أفراد</small></div></div>
  ${op?`<div class="rcd"><p>المسجد: <b>${esc(mname(p.m))}</b> · الحالة الاجتماعية: <b>${esc(p.marital||'—')}</b> · حالة الاحتياج: <b>${esc(p.status)}</b></p><p>الزوجة: <b>${esc(p.wname||'—')}</b> · هويتها: <b>${esc(p.wid||'—')}</b></p>${p.note?`<p>ملاحظات: <b>${esc(p.note)}</b></p>`:''}
  <p>الأولوية: <select data-p="${p.id}">${PR.map(x=>`<option ${x===p.prio?'selected':''}>${x}</option>`).join('')}</select> &nbsp; <label class="chk" style="display:inline-flex;margin:0"><input type="checkbox" data-n="${p.id}" ${p.nom?'checked':''}> مرشّح للمساعدة</label></p>
- <p>آخر استلام: <b>${p.last?esc(p.last)+(p.lt?' ('+esc(p.lt)+')':''):'لم يستلم بعد'}</b></p>
+ <p>النقاط المتراكمة: <b>${p.pts||0}</b></p><p>آخر استلام: <b>${p.last?esc(p.last)+(p.lt?' ('+esc(p.lt)+')':''):'لم يستلم بعد'}</b></p>
  <div><b style="color:#111">كل ما استلمه:</b>${h===undefined?'<div class="empty" style="padding:8px">جاري التحميل…</div>':h.length?`<div class="hist">${h.map(a=>`<div><span>${esc(a.type)}</span><span>${esc(a.date)}</span></div>`).join('')}</div>`:'<p>لا توجد استفادات مسجلة</p>'}</div></div>
  <div class="rca"><button class="lnk ed" data-e="${p.id}">✎ ${isM()?'تعديل البيانات':'طلب تعديل'}</button>${p.phone?`<a class="lnk wa" href="https://wa.me/${waNum(p.phone)}?text=${encodeURIComponent(msgFor(p))}" target="_blank" rel="noopener">واتساب</a><a class="lnk sm" href="sms:${esc(p.phone)}?body=${encodeURIComponent(msgFor(p))}">رسالة SMS</a>`:''}<button class="lnk rm" data-d="${p.id}">${isM()?'حذف':'طلب حذف'}</button></div>`:''}</div>`};
 function parseRows(buf,dm,force){const wb=XLSX.read(buf,{type:'array'}),rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''}),out=[];let sk=0;
@@ -243,6 +249,42 @@ function vData(pre){
   dbOps({scope:$('#dsc').value,file:f,delPP:md==='replace',delAI:md==='replace'&&$('#dai').checked,backup:$('#dbk').checked})};
  $('#wgo').onclick=()=>{const o={scope:$('#wsc').value,delPP:$('#wpp').checked,delAI:$('#wai').checked,delLog:$('#wlg').checked,backup:$('#wbk').checked};if(!o.delPP&&!o.delAI&&!o.delLog)return toast('اختر ما تريد حذفه');
   if(prompt('هذا الحذف نهائي. للتأكيد اكتب: تصفير')!=='تصفير')return;dbOps(o)}}
+function quotas(total,shares,pop){
+ const ms=CF.mosques.map(m=>m.id),fixed=ms.filter(m=>+shares[m]>0),rest=ms.filter(m=>!(+shares[m]>0)),fs_=fixed.reduce((a,m)=>a+(+shares[m]),0),k=fs_>100?100/fs_:1,remain=Math.max(0,100-fs_*k),pr=rest.reduce((a,m)=>a+(pop[m]||0),0),pct={};
+ fixed.forEach(m=>pct[m]=shares[m]*k);rest.forEach(m=>pct[m]=pr?remain*(pop[m]||0)/pr:(rest.length?remain/rest.length:0));
+ const sp=ms.reduce((a,m)=>a+(pct[m]||0),0)||1;ms.forEach(m=>pct[m]=(pct[m]||0)*100/sp);
+ const raw=ms.map(m=>({m,v:total*pct[m]/100})),base=raw.map(r=>({m:r.m,n:Math.floor(r.v),f:r.v-Math.floor(r.v)}));let left=total-base.reduce((a,b)=>a+b.n,0);
+ [...base].sort((a,b)=>b.f-a.f).slice(0,Math.max(0,left)).forEach(b=>b.n++);const q={};base.forEach(b=>q[b.m]=b.n);return{pct,q}}
+function idxErr(e){console.error(e);const u=(e.message||'').match(/https:\/\/\S+/);if(u&&confirm('هذه العملية تحتاج فهرساً في Firebase (مرة واحدة). فتح الرابط؟'))window.open(u[0].replace(/[.,)]+$/,''));else toast('تعذرت العملية')}
+async function pickLow(m,need){const its=[];let emp=0;
+ for(let lvl=0;lvl<=80&&need>0;lvl++){let got=0;for(const pr of PR){if(need<=0)break;const s=await DB.collection('pp').where('del','==',false).where('m','==',m).where('nom','==',false).where('pts','==',lvl).where('prio','==',pr).limit(need).get(GO());s.docs.forEach(d=>its.push({p:d.data(),pt:{nom:true}}));need-=s.size;got+=s.size}
+  if(got)emp=0;else if(++emp>=8&&its.length)break;if(emp>=25)break}
+ return its}
+async function autoNom(n){const m=all()?fm:ME.m;if(m==='all')return toast('اختر مسجداً من الأعلى، أو استخدم خطة التوزيع بالنسب');try{const its=await pickLow(m,n);if(!its.length)return toast('لا يوجد مرشحون متاحون (شغّل فحص وإعادة بناء الإحصائيات إذا كانت بيانات قديمة)');delete PG.nom;await chg(its,'nom','ترشيح (الأقل نقاطاً) لـ '+its.length+' أسرة – '+mname(m))}catch(e){idxErr(e)}}
+async function runPlan(onlyM){const plan=CF.plan||{},tot=+plan.total||0;if(!tot)return toast('حدد إجمالي المرشحين في الخطة أولاً');const pop={};CF.mosques.forEach(m=>pop[m.id]=sd('t_'+m.id));const{q}=quotas(tot,plan.shares||{},pop);
+ try{const its=[],det=[];for(const m of CF.mosques){if(onlyM&&m.id!==onlyM)continue;const need=Math.max(0,(q[m.id]||0)-sd('n_'+m.id));if(!need)continue;const r=await pickLow(m.id,need);its.push(...r);det.push(m.name+': '+r.length)}
+  if(!its.length)return toast('الحصص مكتملة أو لا يوجد أسماء متاحة');delete PG.nom;await chg(its,'nom','ترشيح بالحصص ('+its.length+' أسرة) — '+det.join('، '),onlyM||'')}catch(e){idxErr(e)}}
+function planCard(){
+ const plan=CF.plan||{total:0,shares:{}},ed=isM(),pop={},M=all()?CF.mosques:CF.mosques.filter(m=>m.id===ME.m);CF.mosques.forEach(m=>pop[m.id]=sd('t_'+m.id));
+ const{pct,q}=quotas(+plan.total||0,plan.shares||{},pop);
+ return`<div class="card"><h2>خطة الترشيح بالنسب</h2>${ed?`<div class="tools"><label>إجمالي عدد المرشحين <input id="ptot" type="number" min="0" value="${+plan.total||0}" style="width:100px"></label></div>`:`<p style="margin:0 0 8px;color:var(--mut)">إجمالي المرشحين المحدد من المدير: <b style="color:#111">${+plan.total||0}</b></p>`}
+ <div class="tw"><table><tr><th>المسجد</th><th>السكان</th><th>نسبة ثابتة %</th><th>النسبة الفعلية</th><th>الحصة</th><th>مرشحون الآن</th></tr>${M.map(m=>`<tr><td>${esc(m.name)}</td><td>${pop[m.id]}</td><td>${ed?`<input data-sh="${m.id}" type="number" min="0" max="100" step="0.5" placeholder="تلقائي" value="${(plan.shares||{})[m.id]||''}" style="width:90px">`:((plan.shares||{})[m.id]?plan.shares[m.id]+'%':'تلقائي')}</td><td data-pc="${m.id}">${(pct[m.id]||0).toFixed(1)}%</td><td data-q="${m.id}"><b>${q[m.id]||0}</b></td><td>${sd('n_'+m.id)}</td></tr>`).join('')}</table></div>
+ <p style="color:var(--mut);font-size:13px;margin:8px 0">النسبة الثابتة (اختيارية) بتتحدد للمسجد، والباقي بيتوزع على باقي المساجد حسب عدد سكانها. بيترشح الأقل نقاطاً أولاً، ثم حسب الأولوية.</p>
+ <div class="tools" style="margin:0">${ed?'<button class="btn alt" id="psave">حفظ الخطة</button>':''}${all()?'<button class="btn gold" id="prun">تنفيذ الترشيح لكل المساجد</button>':'<button class="btn gold" id="prunm">ترشيح حصة مسجدي</button>'}</div></div>`}
+function bindPlan(){
+ const rd_=()=>{const tot=+($('#ptot')?$('#ptot').value:(CF.plan||{}).total)||0,sh={};document.querySelectorAll('[data-sh]').forEach(i=>{const v=+i.value;if(v>0)sh[i.dataset.sh]=v});return{tot,sh}};
+ const upd=()=>{if(!$('#ptot'))return;const{tot,sh}=rd_(),pop={};CF.mosques.forEach(m=>pop[m.id]=sd('t_'+m.id));const{pct,q}=quotas(tot,sh,pop);CF.mosques.forEach(m=>{const a=document.querySelector('[data-pc="'+m.id+'"]'),b=document.querySelector('[data-q="'+m.id+'"]');if(a)a.textContent=(pct[m.id]||0).toFixed(1)+'%';if(b)b.innerHTML='<b>'+(q[m.id]||0)+'</b>'})};
+ if($('#ptot')){$('#ptot').oninput=upd;document.querySelectorAll('[data-sh]').forEach(i=>i.oninput=upd)}
+ const sv=$('#psave');if(sv)sv.onclick=()=>{const{tot,sh}=rd_();set('cf',{id:'main',...CF,plan:{total:tot,shares:sh}});toast('تم حفظ الخطة')};
+ const pr=$('#prun');if(pr)pr.onclick=async()=>{if(isM()){const{tot,sh}=rd_();CF.plan={total:tot,shares:sh};await set('cf',{id:'main',...CF})}runPlan(null)};
+ const pm=$('#prunm');if(pm)pm.onclick=()=>runPlan(ME.m)}
+function vPts(pre){
+ const T=CF.aid.map(x=>({...x})),n0=T.length;
+ const rn=()=>{$('#main').innerHTML=pre+`<div class="card"><h2>أنواع الاستفادة والنقاط</h2><p style="margin:0 0 10px;color:var(--mut)">لكل نوع عدد نقاط. بيترشح أولاً اللي مجموع نقاطه أقل. ما بينحذف نوع (بس بتعطّله) عشان ما تضيع الإحصائيات. تغيير النقاط بيأثر على الاستفادات الجديدة فقط.</p><div class="tw"><table><tr><th>النوع</th><th>النقاط</th><th>مفعّل</th></tr>${T.map((x,i)=>`<tr><td><input data-pn="${i}" value="${esc(x.n)}" ${i<n0?'disabled':''}></td><td><input data-pp="${i}" type="number" min="0" step="0.5" value="${x.p}" style="width:90px"></td><td><input data-po="${i}" type="checkbox" ${x.off?'':'checked'}></td></tr>`).join('')}</table></div><div class="tools" style="margin:12px 0 0"><button class="btn alt" id="pa">+ نوع جديد</button><button class="btn" id="ps">حفظ</button></div></div>`;
+  document.querySelectorAll('[data-pn]').forEach(i=>i.oninput=()=>T[+i.dataset.pn].n=i.value);document.querySelectorAll('[data-pp]').forEach(i=>i.oninput=()=>T[+i.dataset.pp].p=+i.value||0);document.querySelectorAll('[data-po]').forEach(i=>i.onchange=()=>T[+i.dataset.po].off=!i.checked);
+  $('#pa').onclick=()=>{T.push({n:'',p:1,off:false});rn()};
+  $('#ps').onclick=()=>{const out=T.filter((x,i)=>i<n0||x.n.trim()).map(x=>({n:x.n.trim(),p:+x.p||0,off:!!x.off}));if(new Set(out.map(x=>x.n)).size!==out.length)return toast('أسماء الأنواع يجب أن تكون مختلفة');set('cf',{id:'main',...CF,aid:out});toast('تم الحفظ')}};
+ rn()}
 function vDb(){
  const qq=q.trim(),qs=nz(qq);let mks,flt=null;
  if(/^\d{6,}$/.test(qq))mks=[()=>bq().where('idno','==',qq),()=>bq().where('phone','==',qq)];
@@ -304,10 +346,11 @@ function restoreJSON(f){const r=new FileReader();r.onload=async()=>{try{const o=
 async function prepOffline(){if(!navigator.onLine)return toast('لازم تكون متصل لتجهيز الجهاز');if(!confirm('سيتم تحميل بيانات '+(all()?'كل المساجد':'مسجدك')+' على هذا الجهاز ليعمل بدون إنترنت (يستهلك قراءات بعدد السجلات). المتابعة؟'))return;
  try{const m=all()?null:ME.m,c=n=>toast('تم تحميل '+n),a=await scan(()=>m?DB.collection('pp').where('m','==',m):DB.collection('pp'),1000,c),b=await scan(()=>m?DB.collection('ai').where('m','==',m):DB.collection('ai'),1000,c);toast('الجهاز جاهز للعمل بدون إنترنت ('+a.length+' أسرة) ✓')}catch(e){console.error(e);toast('تعذر التجهيز')}}
 async function recount(){if(!confirm('سيتم فحص كل السجلات وإعادة بناء الإحصائيات (يستهلك قراءات بعدد السجلات). المتابعة؟'))return;try{
+ const ais=await scan(()=>DB.collection('ai')),sp={};ais.forEach(a=>{sp[a.pid]=(sp[a.pid]||0)+(a.pt!=null?+a.pt:APT(a.type))});
  const all_=await scan(()=>DB.collection('pp'),1000,c=>toast('تم فحص '+c)),acc={},fix=[];
- all_.forEach(p=>{const n={...p,del:!!p.del,got:!!(p.got||p.last),nom:!!p.nom,prio:p.prio||'عادية'};if(!Array.isArray(p.kw))n.kw=kws(p);if(p.del!==n.del||p.got!==n.got||p.nom!==n.nom||p.prio!==n.prio||n.kw!==p.kw)fix.push(n);mrg(acc,cnt(n))});
+ all_.forEach(p=>{const n={...p,del:!!p.del,got:!!(p.got||p.last),nom:!!p.nom,prio:p.prio||'عادية',pts:sp[p.id]||0};if(!Array.isArray(p.kw))n.kw=kws(p);if(p.del!==n.del||p.got!==n.got||p.nom!==n.nom||p.prio!==n.prio||p.pts!==n.pts||n.kw!==p.kw)fix.push(n);mrg(acc,cnt(n))});
  for(let i=0;i<fix.length;i+=400){const b=DB.batch();fix.slice(i,i+400).forEach(x=>b.set(DB.doc('pp/'+x.id),x));await ack(b.commit())}
- (await scan(()=>DB.collection('ai'))).forEach(a=>{mrg(acc,{['a_'+a.m+'_'+Math.max(0,AT.indexOf(a.type))]:1})});
+ ais.forEach(a=>{mrg(acc,{['a_'+a.m+'_'+Math.max(0,AT.indexOf(a.type))]:1})});
  await ack(DB.doc('st/main').set(acc));PG={};toast('تمت إعادة الحساب ('+all_.length+' أسرة)');draw()}catch(e){console.error(e);toast('تعذر إعادة الحساب')}}
 
 async function xlm(o,name){try{const wb=XLSX.utils.book_new();wb.Workbook={Views:[{RTL:true}]};Object.entries(o).forEach(([k,v])=>XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(v.length?v:[{}]),k));dl(name,new Blob([XLSX.write(wb,{type:'array',bookType:'xlsx'})]))}catch(e){toast('تعذر التصدير')}}
@@ -321,18 +364,16 @@ document.addEventListener('click',async e=>{const a=e.target.closest('a.sms,[dat
  else{try{const k=a.dataset.csv;dl('sms-'+today()+'.csv',new Blob(['\ufeffphone,message\n'+SR[k].map(r=>`"${r.phone}","${smsMsg(k,r).replace(/"/g,'""')}"`).join('\n')],{type:'text/csv'}))}catch(x){}}});
 const MS=()=>all()?(fm==='all'?CF.mosques:CF.mosques.filter(m=>m.id===fm)):CF.mosques.filter(m=>m.id===ME.m);
 function vAidSec(){const pre=subnav('aid',[['nom','الترشيح'],['ben','المستفيدون'],['stats','إحصائيات المساجد']]);({nom:paneNom,ben:paneBen,stats:paneStats})[sub.aid](pre);bsub()}
-async function autoNom(n){try{let need=n;const its=[];for(const lv of PR){if(need<=0)break;const s=await bq().where('nom','==',false).where('got','==',false).where('prio','==',lv).limit(need).get(GO());s.docs.forEach(d=>its.push({p:d.data(),pt:{nom:true}}));need-=s.size}
- if(!its.length)return toast('لا يوجد من يستحق (الباقون مرشحون أو استلموا سابقاً)');delete PG.nom;await chg(its,'nom','ترشيح تلقائي لـ '+its.length+' أسرة')}catch(e){console.error(e);const u=(e.message||'').match(/https:\/\/\S+/);if(u&&confirm('هذا الاقتراح يحتاج فهرساً في Firebase (مرة واحدة). فتح الرابط؟'))window.open(u[0].replace(/[.,)]+$/,''));else toast('تعذر الترشيح')}}
-async function recAid(S2,t){try{const ti=Math.max(0,AT.indexOf(t)),ts=Date.now(),ids=[],acc={},docs=S2.map(p=>{const id=uid('a');ids.push(id);const k='a_'+p.m+'_'+ti;acc[k]=(acc[k]||0)+1;return{id,pid:p.id,name:p.name,idno:p.idno,phone:p.phone,m:p.m,type:t,date:today(),ts,by:ME.name}});
+async function recAid(S2,t){try{const ti=Math.max(0,AT.indexOf(t)),ts=Date.now(),ids=[],acc={},docs=S2.map(p=>{const id=uid('a');ids.push(id);const k='a_'+p.m+'_'+ti;acc[k]=(acc[k]||0)+1;return{id,pid:p.id,name:p.name,idno:p.idno,phone:p.phone,m:p.m,type:t,pt:APT(t),date:today(),ts,by:ME.name}});
  for(let i=0;i<docs.length;i+=400){const b=DB.batch();docs.slice(i,i+400).forEach(a=>b.set(DB.doc('ai/'+a.id),a));await ack(b.commit())}
- await stAdd(acc);delete PG.nom;delete PG.ben;await chg(S2.map(p=>({p,pt:{nom:false,got:true,last:today(),lt:t}})),'rec','تسجيل استلام ('+t+') لـ '+S2.length+' أسرة',S2[0].m,{ai:ids,aic:acc})}catch(e){console.error(e);toast('تعذر التسجيل')}}
+ await stAdd(acc);delete PG.nom;delete PG.ben;await chg(S2.map(p=>({p,pt:{nom:false,got:true,last:today(),lt:t,pts:(+p.pts||0)+APT(t)}})),'rec','تسجيل استلام ('+t+') لـ '+S2.length+' أسرة',S2[0].m,{ai:ids,aic:acc})}catch(e){console.error(e);toast('تعذر التسجيل')}}
 function paneNom(pre){
- const P=pager('nom',JSON.stringify([fm,ME.u]),[()=>bq().where('nom','==',true)]),nl=[...P.rows].sort((a,b)=>PR.indexOf(a.prio)-PR.indexOf(b.prio)||(+b.fam||0)-(+a.fam||0)),S2=nl.filter(p=>!ex.has(p.id)),ms=[...new Set(S2.map(p=>p.m))],mem=D.ac.filter(a=>a.phone&&(a.role!=='member'||ms.includes(a.m)));
- $('#main').innerHTML=pre+`<div class="tools">${mbar()}<label>ترشيح تلقائي لأعلى <input id="an" type="number" min="1" value="10" style="width:70px"></label><button class="btn gold" id="auto">اقتراح</button><span class="tag">المرشحون حالياً: ${sum(MS(),'n')}</span></div>${errBox(P)}
- <div class="card"><div class="tools"><b>المحدد: ${S2.length} من ${nl.length}${P.done?'':'+'}</b><select id="at">${AT.map(x=>`<option>${x}</option>`).join('')}</select><button class="btn" id="rec">تسجيل الاستلام للمحددين</button><button class="btn alt" id="x1">تصدير Excel</button><button class="btn alt" id="px">طباعة</button></div>
- ${nl.length?`<div class="tw"><table><tr><th></th><th>الاسم</th><th>المسجد</th><th>الأفراد</th><th>الأولوية</th></tr>${nl.map(p=>`<tr class="${ex.has(p.id)?'nop':''}"><td><input type="checkbox" data-c="${p.id}" ${ex.has(p.id)?'':'checked'}></td><td>${esc(p.name)}</td><td>${esc(mname(p.m))}</td><td>${p.fam}</td><td>${esc(p.prio)}</td></tr>`).join('')}</table></div>`:(P.busy?'<div class="empty">جاري التحميل…</div>':'<div class="empty">لا يوجد مرشحون. رشّح من قاعدة البيانات أو استخدم الترشيح التلقائي.</div>')}${moreBtn(P)}</div>
+ const P=pager('nom',JSON.stringify([fm,ME.u]),[()=>bq().where('nom','==',true)]),nl=[...P.rows].sort((a,b)=>(a.pts||0)-(b.pts||0)||PR.indexOf(a.prio)-PR.indexOf(b.prio)||(+b.fam||0)-(+a.fam||0)),S2=nl.filter(p=>!ex.has(p.id)),ms=[...new Set(S2.map(p=>p.m))],mem=D.ac.filter(a=>a.phone&&(a.role!=='member'||ms.includes(a.m)));
+ $('#main').innerHTML=pre+planCard()+`<div class="tools">${mbar()}<label>اقتراح يدوي لأعلى <input id="an" type="number" min="1" value="10" style="width:70px"></label><button class="btn alt" id="auto">اقتراح (الأقل نقاطاً)</button><span class="tag">المرشحون حالياً: ${sum(MS(),'n')}</span></div>${errBox(P)}
+ <div class="card"><div class="tools"><b>المحدد: ${S2.length} من ${nl.length}${P.done?'':'+'}</b><select id="at">${actTypes().map(x=>`<option value="${esc(x)}">${esc(x)} (${APT(x)} نقاط)</option>`).join('')}</select><button class="btn" id="rec">تسجيل الاستلام للمحددين</button><button class="btn alt" id="x1">تصدير Excel</button><button class="btn alt" id="px">طباعة</button></div>
+ ${nl.length?`<div class="tw"><table><tr><th></th><th>الاسم</th><th>المسجد</th><th>الأفراد</th><th>الأولوية</th><th>النقاط</th></tr>${nl.map(p=>`<tr class="${ex.has(p.id)?'nop':''}"><td><input type="checkbox" data-c="${p.id}" ${ex.has(p.id)?'':'checked'}></td><td>${esc(p.name)}</td><td>${esc(mname(p.m))}</td><td>${p.fam}</td><td>${esc(p.prio)}</td><td>${p.pts||0}</td></tr>`).join('')}</table></div>`:(P.busy?'<div class="empty">جاري التحميل…</div>':'<div class="empty">لا يوجد مرشحون. رشّح من قاعدة البيانات أو استخدم الترشيح التلقائي.</div>')}${moreBtn(P)}</div>
  ${S2.length?smsBox('b','رسالة للمستفيدين المحددين',S2.slice(0,500).map(p=>({'الاسم':p.name,phone:p.phone,'المسجد':mname(p.m)})),CF.sms)+smsBox('m','إعلام الأعضاء بالترشيح',mem.map(a=>({'الاسم':a.name,phone:a.phone,'العدد':S2.filter(p=>a.role==='member'?p.m===a.m:true).length})),'السلام عليكم {الاسم}، تم ترشيح {العدد} أسرة للمساعدة، يرجى المراجعة.'):''}`;
- bfm();bmore(P);document.querySelectorAll('[data-c]').forEach(c=>c.onchange=()=>{c.checked?ex.delete(c.dataset.c):ex.add(c.dataset.c);draw()});
+ bfm();bmore(P);bindPlan();document.querySelectorAll('[data-c]').forEach(c=>c.onchange=()=>{c.checked?ex.delete(c.dataset.c):ex.add(c.dataset.c);draw()});
  $('#auto').onclick=()=>autoNom(+$('#an').value||10);$('#px').onclick=()=>window.print();$('#x1').onclick=()=>xl(S2.map(rowOut),'ترشيحات-'+today()+'.xlsx');
  $('#rec').onclick=()=>{if(S2.length&&confirm('تسجيل استلام '+S2.length+' أسرة؟'))recAid(S2,$('#at').value)}}
 function paneBen(pre){
@@ -399,6 +440,7 @@ function vSet(){
  if(sub.set==='users')vUsr(pre);
  else if(sub.set==='pw')vPw(pre);
  else if(sub.set==='data')vData(pre);
+ else if(sub.set==='pts')vPts(pre);
  else if(sub.set==='trash'||sub.set==='hist')vBin(pre);
  else if(sub.set==='cfg'){
   $('#main').innerHTML=pre+`<div class="card"><h2>المساجد</h2>${CF.mosques.map(m=>`<div class="tools"><input data-r="${m.id}" value="${esc(m.name)}" style="flex:1"><span class="tag">${sd('t_'+m.id)} أسرة</span></div>`).join('')}</div>
@@ -429,7 +471,7 @@ async function boot0(){
   on(mem?C('rq').where('by','==',un).limit(100):C('rq').where('st','==','pending').limit(300),'rq');
   if(a.role==='manager')on(C('ev').where('seen','==',false).limit(100),'ev');
   on(DB.doc('st/main'),'st',s=>{SD=s.exists?s.data():{}});
-  UN.push(DB.doc('cf/main').onSnapshot(s=>{if(s.exists){const c=s.data();CF={mosques:c.mosques||CF.mosques,sms:c.sms||CF.sms,lastBackup:c.lastBackup||''}}else if(a.role==='manager')set('cf',{id:'main',...CF});rdy.cf=1;rd()},e=>toast('خطأ: '+(e.code||''))));
+  UN.push(DB.doc('cf/main').onSnapshot(s=>{if(s.exists){const c=s.data();CF={mosques:c.mosques||CF.mosques,sms:c.sms||CF.sms,lastBackup:c.lastBackup||'',aid:c.aid||DEFAID,plan:c.plan||{total:0,shares:{}}};AT=CF.aid.map(a=>a.n)}else if(a.role==='manager')set('cf',{id:'main',...CF});rdy.cf=1;rd()},e=>toast('خطأ: '+(e.code||''))));
   draw()})}
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 boot0();

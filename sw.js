@@ -1,4 +1,4 @@
-const V='takaful-v3',CORE=['./','./index.html','./manifest.webmanifest','./logo.png','./logo-full.png','./favicon.png','./icon-192.png','./icon-512.png'];
+const V='takaful-v4',CORE=['./','./index.html','./manifest.webmanifest','./logo.png','./logo-full.png','./favicon.png','./icon-192.png','./icon-512.png'];
 const HOSTS=['www.gstatic.com','cdn.jsdelivr.net','unpkg.com','cdnjs.cloudflare.com','fonts.googleapis.com','fonts.gstatic.com'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(V).then(c=>Promise.all(CORE.map(u=>c.add(u).catch(()=>{})))).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==V).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
