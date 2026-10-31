@@ -79,6 +79,15 @@ body.out{background:linear-gradient(180deg,#f4fbf8,#fff 60%)}
 .net{border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;white-space:nowrap}.net.off{background:#fde8e6;color:#a33a28}.net.sync{background:#fdf0d5;color:#8a5a12}.net.on{background:#e3f4ea;color:#14633b}.net[hidden]{display:none}
 @media(max-width:860px){.app{display:block}aside{position:fixed;inset:auto 0 0 0;top:auto;width:auto;height:auto;flex-direction:row;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));z-index:20;border-inline-end:0;border-top:1px solid var(--line);box-shadow:0 -10px 30px -18px rgba(0,0,0,.25);overflow:visible}.brand{display:none}nav{flex-direction:row;gap:2px;width:100%}nav>button{flex:1;flex-direction:column;gap:3px;padding:7px 4px;font-size:11px;justify-content:center;align-items:center;text-align:center;position:relative;border-radius:12px}nav b{position:absolute;top:2px;inset-inline-start:10px;margin:0}main{padding:18px 14px 100px}.top{padding:10px 14px}.who small{display:none}.who{display:none}.bar{grid-template-columns:80px 1fr 36px}.f{grid-template-columns:1fr}.hero h1{font-size:24px}.hgrid{grid-template-columns:1fr}.hcard{flex-direction:row;align-items:center;flex-wrap:wrap;padding:16px 18px}.hcard small{flex-basis:100%;padding-inline-start:0}.hicon{margin:0 0 0 0;width:48px;height:48px}.hcard i{top:22px}}
 @media print{aside,.top,.tools,.seg,.bell,.net,#toast,nav,[data-e],[data-d],input[type=checkbox],select,.nop,.hbk{display:none!important}body{background:#fff;color:#000}.card,.kpi{box-shadow:none;border:0}main{padding:0;max-width:none}th{position:static}}
+.rlist{display:flex;flex-direction:column;gap:12px}
+.rc{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--sh);overflow:hidden;transition:border-color .15s,box-shadow .15s}.rc:hover{border-color:#cfe3da}.rc.open{border-color:#9fd1bf;box-shadow:0 14px 34px -20px rgba(15,107,87,.5)}
+.rch{display:flex;align-items:flex-start;gap:14px;padding:16px 18px;cursor:pointer}.rci{flex:1;min-width:0}.rcn{font-size:19px;font-weight:800}.rcm{color:var(--mut);margin-top:3px}.rcm b{color:#111}
+.rcb{flex:none;min-width:76px;text-align:center;background:#e8f3ef;border:1px solid #d4e8e0;border-radius:18px;padding:8px 10px;font-size:28px;font-weight:800;color:#0b5a49;line-height:1.1}.rcb small{display:block;font-size:11px;font-weight:700;color:#4b6a60}
+.pen{background:none;border:0;cursor:pointer;color:#8a9199;font-size:17px;padding:0 4px}.pen:hover{color:var(--acc2)}
+.rcd{border-top:1.5px dashed #dcdfe3;margin:0 18px;padding:12px 0 4px}.rcd p{margin:7px 0;color:var(--mut)}.rcd p b{color:#111}
+.hist{display:flex;flex-direction:column;gap:6px;margin:8px 0}.hist div{display:flex;justify-content:space-between;background:#f7f8fa;border-radius:10px;padding:7px 12px}
+.rca{display:flex;flex-wrap:wrap;gap:6px 20px;align-items:center;padding:6px 18px 16px}.lnk{background:none;border:0;cursor:pointer;font-weight:800;padding:6px 2px;text-decoration:none;font-size:15px}.lnk.wa{color:#16a34a}.lnk.ed{color:#0b5a49}.lnk.rm{color:#a33a28}.lnk.sm{color:#3b6fd4}
+.chk{display:flex;align-items:center;gap:8px;margin:8px 0;color:#111}
 </style>
 </head>
 <body>
@@ -118,7 +127,7 @@ function bfm(){const e=$('#fm');if(e)e.onchange=()=>{fm=e.value;draw()}}
 function closeMore(){const m=$('#moreMenu'),s=$('#menuShade'),b=$('#moreBtn');if(m)m.hidden=true;if(s)s.hidden=true;if(b)b.setAttribute('aria-expanded','false')}
 const HOME={db:['قاعدة البيانات','إضافة وتعديل وحذف واستيراد وتصدير بيانات السكان','#0f6b57'],aid:['إدارة المساعدات','ترشيح الأسماء والمستفيدون وإحصائيات المساجد','#e08a1e'],req:['طلبات الاعتماد','طلبات الإضافة والتعديل والحذف بانتظار القرار','#3b6fd4'],rep:['التقارير','تقارير إحصائية وتقارير المستفيدين بصيغة Excel','#7a4fd0'],set:['الإعدادات','الحسابات وكلمة المرور والسلة والنسخ الاحتياطي','#475467']};
 const SHORT={db:'البيانات',aid:'المساعدات',req:'الطلبات',rep:'التقارير',set:'الإعدادات'};
-const setItems=()=>{const a=[];if(all())a.push(['users','الحسابات']);a.push(['pw','كلمة المرور']);if(isM())a.push(['cfg','المساجد والرسائل'],['trash','سلة المهملات'],['hist','سجل التراجع'],['bk','النسخ الاحتياطي']);return a};
+const setItems=()=>{const a=[];if(all())a.push(['users','الحسابات']);a.push(['pw','كلمة المرور']);if(isM())a.push(['data','إدارة قاعدة البيانات'],['cfg','المساجد والرسائل'],['trash','سلة المهملات'],['hist','سجل التراجع'],['bk','النسخ الاحتياطي']);return a};
 function subsOf(t){if(t==='aid')return['aid',[['nom','الترشيح'],['ben','المستفيدون'],['stats','إحصائيات المساجد']]];if(t==='req'&&all())return['req',[['p','بانتظار القرار'],['h','السجل الكامل']]];if(t==='set'){const it=setItems();if(!it.find(x=>x[0]===sub.set))sub.set=it[0][0];return['set',it]}return null}
 function vHome(){
  const M=all()?CF.mosques:CF.mosques.filter(m=>m.id===ME.m),pe=isM()?D.rq.length:D.rq.filter(r=>r.st==='pending').length;
@@ -190,6 +199,50 @@ const sub={db:'list',aid:'nom',bin:'trash',set:'users',req:'p'};
 const subnav=(k,items)=>`<div class="seg">${items.map(([v,l])=>`<button class="${sub[k]===v?'on':''}" data-sub="${k}:${v}">${l}</button>`).join('')}</div>`;
 const bsub=()=>document.querySelectorAll('[data-sub]').forEach(b=>b.onclick=()=>{const[k,v]=b.dataset.sub.split(':');sub[k]=v;draw()});
 async function loadAll(mk,flt){toast('جاري تحميل البيانات…');const r=await scan(mk,1000,c=>toast('تم تحميل '+c));return flt?r.filter(flt):r}
+let OPEN=null,AH={};
+const waNum=t=>{let d=String(t||'').replace(/\D/g,'');if(d.startsWith('00'))d=d.slice(2);else if(d.startsWith('0'))d='970'+d.slice(1);else if(d.length<=9)d='970'+d;return d};
+const msgFor=p=>CF.sms.replace(/\{الاسم\}/g,p.name).replace(/\{المسجد\}/g,mname(p.m));
+async function loadHist(id){try{let q=DB.collection('ai').where('pid','==',id);if(!all())q=q.where('m','==',ME.m);const s=await q.get(GO());AH[id]=s.docs.map(d=>d.data()).sort((a,b)=>(b.ts||0)-(a.ts||0))}catch(e){console.error(e);AH[id]=[]}draw()}
+const cardHtml=p=>{const op=OPEN===p.id,h=AH[p.id];
+ return`<div class="rc ${op?'open':''}"><div class="rch" data-o="${p.id}"><div class="rci"><div><b class="rcn">${esc(p.name)}</b> <button class="pen" data-e="${p.id}" aria-label="تعديل">✎</button> ${p.nom?'<span class="tag w">مرشّح</span>':''} ${p.got?'<span class="tag ok">استلم</span>':''}</div><div class="rcm">رقم الهوية: <b>${esc(p.idno||'—')}</b> · الجوال: <b>${esc(p.phone||'—')}</b></div></div><div class="rcb">${esc(p.fam)}<small>أفراد</small></div></div>
+ ${op?`<div class="rcd"><p>المسجد: <b>${esc(mname(p.m))}</b> · الحالة الاجتماعية: <b>${esc(p.marital||'—')}</b> · حالة الاحتياج: <b>${esc(p.status)}</b></p><p>الزوجة: <b>${esc(p.wname||'—')}</b> · هويتها: <b>${esc(p.wid||'—')}</b></p>${p.note?`<p>ملاحظات: <b>${esc(p.note)}</b></p>`:''}
+ <p>الأولوية: <select data-p="${p.id}">${PR.map(x=>`<option ${x===p.prio?'selected':''}>${x}</option>`).join('')}</select> &nbsp; <label class="chk" style="display:inline-flex;margin:0"><input type="checkbox" data-n="${p.id}" ${p.nom?'checked':''}> مرشّح للمساعدة</label></p>
+ <p>آخر استلام: <b>${p.last?esc(p.last)+(p.lt?' ('+esc(p.lt)+')':''):'لم يستلم بعد'}</b></p>
+ <div><b style="color:#111">كل ما استلمه:</b>${h===undefined?'<div class="empty" style="padding:8px">جاري التحميل…</div>':h.length?`<div class="hist">${h.map(a=>`<div><span>${esc(a.type)}</span><span>${esc(a.date)}</span></div>`).join('')}</div>`:'<p>لا توجد استفادات مسجلة</p>'}</div></div>
+ <div class="rca"><button class="lnk ed" data-e="${p.id}">✎ ${isM()?'تعديل البيانات':'طلب تعديل'}</button>${p.phone?`<a class="lnk wa" href="https://wa.me/${waNum(p.phone)}?text=${encodeURIComponent(msgFor(p))}" target="_blank" rel="noopener">واتساب</a><a class="lnk sm" href="sms:${esc(p.phone)}?body=${encodeURIComponent(msgFor(p))}">رسالة SMS</a>`:''}<button class="lnk rm" data-d="${p.id}">${isM()?'حذف':'طلب حذف'}</button></div>`:''}</div>`};
+function parseRows(buf,dm,force){const wb=XLSX.read(buf,{type:'array'}),rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''}),out=[];let sk=0;
+ rows.forEach(x=>{const g=(...k)=>String(k.map(i=>x[i]).find(v=>v!=null&&v!=='')??'').trim(),name=g('الاسم رباعي','الاسم');if(!name)return;const mv=g('المسجد'),mid=force?dm:(all()?((CF.mosques.find(k=>k.name===mv||(mv&&(k.name.includes(mv)||mv.includes(k.name))))||{}).id||dm):dm);if(!mid){sk++;return}
+  out.push(mkP({name,idno:g('رقم الهوية'),phone:g('رقم الجوال','الجوال'),fam:g('عدد الأفراد','أفراد الأسرة'),marital:g('الحالة الاجتماعية'),wid:g('رقم هوية الزوجة'),wname:g('اسم الزوجة رباعي','اسم الزوجة'),status:ST.includes(x['الحالة'])?x['الحالة']:'محتاج',prio:PR.includes(x['الأولوية'])?x['الأولوية']:'عادية',note:g('ملاحظات'),m:mid}))});return{out,sk}}
+$('#file').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const dm=all()?(fm==='all'?'':fm):ME.m,r=new FileReader();
+ r.onload=()=>{try{const{out,sk}=parseRows(r.result,dm,false);
+  if(!out.length)return toast('لا توجد أسماء صالحة، تأكد من عمود المسجد');if(sk)toast('تم تجاوز '+sk+' صف بدون مسجد معروف');
+  if(isM()){if(confirm('استيراد '+out.length+' أسرة؟ الموجود مسبقاً (نفس رقم الهوية) سيتحدّث.'))addP(out,'استيراد '+out.length+' أسرة من Excel',out[0].m)}
+  else{const by={};out.forEach(p=>(by[p.m]=by[p.m]||[]).push(p));Object.keys(by).forEach(m=>{for(let i=0;i<by[m].length;i+=400){const c=by[m].slice(i,i+400);sendReq('imp',m,{rows:c,pname:c.length+' أسرة'})}})}}catch(err){toast('تعذر قراءة الملف')}};r.readAsArrayBuffer(f)};
+async function delAll(mk){let n=0;for(;;){const s=await mk().limit(400).get(GO());if(s.empty)break;const b=DB.batch();s.docs.forEach(d=>b.delete(d.ref));await ack(b.commit());n+=s.size;toast('تم حذف '+n);if(s.size<400)break}return n}
+async function dbOps(o){if(!navigator.onLine&&!confirm('أنت غير متصل. العملية بتنفذ محلياً وبتترفع لاحقاً. المتابعة؟'))return;
+ try{const sc=o.scope==='all'?null:o.scope,nm=sc?mname(sc):'كل المساجد';let parsed=null;
+  if(o.file){parsed=parseRows(await o.file.arrayBuffer(),sc||'',!!sc);if(!parsed.out.length)return toast('الملف لا يحتوي أسماء صالحة. لم يتم حذف شيء.')}
+  if(o.backup&&(o.delPP||o.delAI||o.delLog))await backupJSON();
+  if(o.delPP){toast('جاري حذف السكان…');const rows=await loadAll(()=>sc?DB.collection('pp').where('m','==',sc):DB.collection('pp'));await wr(rows.map(p=>({p,n:null})));
+   if(!sc){const k={};Object.keys(SD).filter(x=>!x.startsWith('a_')).forEach(x=>k[x]=firebase.firestore.FieldValue.delete());if(Object.keys(k).length)await ack(DB.doc('st/main').update(k))}}
+  if(o.delAI){toast('جاري حذف سجل المستفيدين…');await delAll(()=>sc?DB.collection('ai').where('m','==',sc):DB.collection('ai'));const k={};Object.keys(SD).filter(x=>x.startsWith('a_'+(sc?sc+'_':''))).forEach(x=>k[x]=firebase.firestore.FieldValue.delete());if(Object.keys(k).length)await ack(DB.doc('st/main').update(k))}
+  if(o.delLog&&!sc){for(const c of['rq','ev','hist'])await delAll(()=>DB.collection(c))}
+  let added=0;if(parsed){await upsert(parsed.out);added=parsed.out.length;if(parsed.sk)toast('تم تجاوز '+parsed.sk+' صف')}
+  ev('إدارة القاعدة ('+nm+'): '+[o.delPP&&'حذف السكان',o.delAI&&'حذف المستفيدين',o.delLog&&'حذف السجلات',parsed&&'رفع '+added+' أسرة'].filter(Boolean).join('، '));
+  PG={};AH={};OPEN=null;toast('تمت العملية ✓');draw()}catch(e){console.error(e);toast('تعذرت العملية: '+(e.message||''))}}
+function vData(pre){
+ const mo='<option value="all">كل المساجد</option>'+CF.mosques.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join('');
+ $('#main').innerHTML=pre+`<div class="card"><h2>رفع قاعدة بيانات جديدة</h2><div class="f"><label>النطاق<select id="dsc">${mo}</select></label><label>طريقة الرفع<select id="dmd"><option value="merge">إضافة وتحديث (بدون حذف)</option><option value="replace">استبدال: حذف الموجود ثم رفع الجديد</option></select></label><label class="w">ملف Excel<input id="dfl" type="file" accept=".xlsx,.xls,.csv"></label></div>
+ <p style="color:var(--mut);font-size:13px">إذا اخترت مسجداً محدداً فكل أسماء الملف بتنزل عليه. وعند "كل المساجد" بيستخدم عمود المسجد في الملف.</p>
+ <label class="chk"><input type="checkbox" id="dbk" checked> تنزيل نسخة احتياطية قبل أي حذف</label><label class="chk"><input type="checkbox" id="dai"> حذف سجل المستفيدين (الاستلام) أيضاً عند الاستبدال</label><div class="tools" style="margin:12px 0 0"><button class="btn" id="dgo">رفع</button></div></div>
+ <div class="card"><h2>حذف / إعادة ضبط (تسفير)</h2><div class="f"><label class="w">النطاق<select id="wsc">${mo}</select></label></div>
+ <label class="chk"><input type="checkbox" id="wpp"> السكان (كل السجلات والسلة)</label><label class="chk"><input type="checkbox" id="wai"> سجل المستفيدين (الاستلام)</label><label class="chk"><input type="checkbox" id="wlg"> الطلبات والإشعارات وسجل التراجع (كل المساجد فقط)</label><label class="chk"><input type="checkbox" id="wbk" checked> تنزيل نسخة احتياطية قبل الحذف</label>
+ <div class="tools" style="margin:12px 0 6px"><button class="btn red" id="wgo">حذف المحدد</button></div><p style="color:var(--mut);font-size:13px;margin:0">الحذف نهائي ولا يمكن التراجع عنه، إلا باسترجاع نسخة احتياطية.</p></div>`;
+ $('#dgo').onclick=()=>{const f=$('#dfl').files[0],md=$('#dmd').value;if(!f)return toast('اختر ملف Excel أولاً');
+  if(md==='replace'&&prompt('سيتم حذف السكان الموجودين في النطاق المحدد ثم رفع الملف. للتأكيد اكتب: استبدال')!=='استبدال')return;
+  dbOps({scope:$('#dsc').value,file:f,delPP:md==='replace',delAI:md==='replace'&&$('#dai').checked,backup:$('#dbk').checked})};
+ $('#wgo').onclick=()=>{const o={scope:$('#wsc').value,delPP:$('#wpp').checked,delAI:$('#wai').checked,delLog:$('#wlg').checked,backup:$('#wbk').checked};if(!o.delPP&&!o.delAI&&!o.delLog)return toast('اختر ما تريد حذفه');
+  if(prompt('هذا الحذف نهائي. للتأكيد اكتب: تصفير')!=='تصفير')return;dbOps(o)}}
 function vDb(){
  const qq=q.trim(),qs=nz(qq);let mks,flt=null;
  if(/^\d{6,}$/.test(qq))mks=[()=>bq().where('idno','==',qq),()=>bq().where('phone','==',qq)];
@@ -198,7 +251,7 @@ function vDb(){
  const P=pager('db',JSON.stringify([qq,fm,fs,fv,ME.u]),mks,flt),L=P.rows,M=all()?(fm==='all'?CF.mosques:CF.mosques.filter(m=>m.id===fm)):CF.mosques.filter(m=>m.id===ME.m),tot=sum(M,'t');
  $('#main').innerHTML=`<div class="tools">${mbar()}<input id="q" placeholder="بحث بالاسم أو الهوية أو الجوال" value="${esc(q)}" style="flex:1;min-width:150px"><select id="fs"><option value="all">كل الحالات</option>${ST.map(x=>`<option>${x}</option>`).join('')}</select><select id="fv"><option value="all">الكل</option><option value="nom">المرشحون</option><option value="got">استلموا</option><option value="no">لم يستلموا</option></select></div>
  <div class="tools"><button class="btn" id="add">+ ${isM()?'إضافة أسرة':'طلب إضافة'}</button><button class="btn alt" id="imp">استيراد Excel</button><button class="btn alt" id="exp">تصدير Excel</button><button class="btn alt" id="tpl">نموذج الاستيراد</button><button class="btn alt" id="prt">طباعة</button><button class="btn alt" id="off">تجهيز للعمل بدون نت</button></div>${errBox(P)}
- <div class="card tw">${L.length?`<table><tr><th>مرشّح</th><th>الاسم</th>${all()?'<th>المسجد</th>':''}<th>الهوية</th><th>الجوال</th><th>الأفراد</th><th>الحالة</th><th>الأولوية</th><th>آخر استلام</th><th></th></tr>`+L.map(p=>`<tr><td><input type="checkbox" data-n="${p.id}" ${p.nom?'checked':''}></td><td>${esc(p.name)}</td>${all()?`<td>${esc(mname(p.m))}</td>`:''}<td>${esc(p.idno)}</td><td>${esc(p.phone)}</td><td>${esc(p.fam)}</td><td><span class="tag">${esc(p.status)}</span></td><td><select data-p="${p.id}">${PR.map(x=>`<option ${x===p.prio?'selected':''}>${x}</option>`).join('')}</select></td><td>${esc(p.last||'—')}</td><td><button class="btn alt s" data-e="${p.id}">${isM()?'تعديل':'طلب تعديل'}</button> <button class="btn red s" data-d="${p.id}">${isM()?'حذف':'طلب حذف'}</button></td></tr>`).join('')+'</table>':(P.busy?'<div class="empty">جاري التحميل…</div>':'<div class="empty">لا توجد نتائج</div>')}
+ <div class="rlist">${L.length?L.map(cardHtml).join(''):(P.busy?'<div class="empty">جاري التحميل…</div>':'<div class="empty">لا توجد نتائج</div>')}
  <div class="tools" style="margin:12px 0 0"><small style="color:var(--mut)">${!qq&&fs==='all'&&fv==='all'?'إجمالي الأسر: '+tot+' · ':''}معروض ${L.length}${P.done?'':'+'}</small></div>${moreBtn(P)}</div>`;
  bfm();bmore(P);$('#fs').value=fs;$('#fv').value=fv;$('#fs').onchange=e=>{fs=e.target.value;FQ=false;draw()};$('#fv').onchange=e=>{fv=e.target.value;FQ=false;draw()};
  const qi=$('#q');if(FQ){qi.focus();qi.setSelectionRange(q.length,q.length)}
@@ -206,7 +259,7 @@ function vDb(){
  const fp=id=>L.find(x=>x.id===id);
  document.querySelectorAll('[data-n]').forEach(c=>c.onchange=()=>{const p=fp(c.dataset.n);chg([{p,pt:{nom:c.checked}}],'nom',(c.checked?'ترشيح ':'إلغاء ترشيح ')+p.name)});
  document.querySelectorAll('[data-p]').forEach(s=>s.onchange=()=>{const p=fp(s.dataset.p);chg([{p,pt:{prio:s.value}}],'prio','أولوية '+p.name+' ← '+s.value)});
- $('#add').onclick=()=>pdlg();document.querySelectorAll('[data-e]').forEach(b=>b.onclick=()=>pdlg(fp(b.dataset.e)));
+ $('#add').onclick=()=>pdlg();document.querySelectorAll('[data-e]').forEach(b=>b.onclick=ev=>{ev.stopPropagation();pdlg(fp(b.dataset.e))});document.querySelectorAll('[data-o]').forEach(h=>h.onclick=()=>{const id=h.dataset.o;OPEN=OPEN===id?null:id;if(OPEN&&AH[OPEN]===undefined)loadHist(OPEN);else draw()});
  document.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{const p=fp(b.dataset.d);if(!confirm((isM()?'نقل إلى سلة المهملات: ':'إرسال طلب حذف ')+p.name+'؟'))return;
   if(isM())chg([{p,pt:{del:true,delAt:Date.now(),delBy:ME.name}}],'del','نقل إلى السلة: '+p.name);else sendReq('del',p.m,{pid:p.id,pname:p.name})});
  $('#off').onclick=prepOffline;$('#imp').onclick=()=>$('#file').click();$('#prt').onclick=()=>window.print();
@@ -225,19 +278,12 @@ function pdlg(p0){
   else{const pt={};Object.keys(f).forEach(k=>{if(String(f[k]==null?'':f[k])!==String(p[k]==null?'':p[k]))pt[k]=f[k]});
    if(isM()){if(Object.keys(pt).length)await chg([{p:p0,pt}],'edit','تعديل '+f.name)}else sendReq('edit',p.m,{data:{...p,...f},pid:p.id,pname:f.name})}
   d.close()}catch(e){toast('تعذر الحفظ')}}}
-$('#file').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const dm=all()?(fm==='all'?'':fm):ME.m,r=new FileReader();
- r.onload=()=>{try{const wb=XLSX.read(r.result,{type:'array'}),rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});const out=[];let sk=0;
-  rows.forEach(x=>{const g=(...k)=>String(k.map(i=>x[i]).find(v=>v!=null&&v!=='')??'').trim(),name=g('الاسم رباعي','الاسم');if(!name)return;const mv=g('المسجد'),mid=all()?((CF.mosques.find(k=>k.name===mv||(mv&&(k.name.includes(mv)||mv.includes(k.name))))||{}).id||dm):dm;if(!mid){sk++;return}
-   out.push(mkP({name,idno:g('رقم الهوية'),phone:g('رقم الجوال','الجوال'),fam:g('عدد الأفراد','أفراد الأسرة'),marital:g('الحالة الاجتماعية'),wid:g('رقم هوية الزوجة'),wname:g('اسم الزوجة رباعي','اسم الزوجة'),status:ST.includes(x['الحالة'])?x['الحالة']:'محتاج',prio:PR.includes(x['الأولوية'])?x['الأولوية']:'عادية',note:g('ملاحظات'),m:mid}))});
-  if(!out.length)return toast('لا توجد أسماء صالحة، تأكد من عمود المسجد');if(sk)toast('تم تجاوز '+sk+' صف بدون مسجد معروف');
-  if(isM()){if(confirm('استيراد '+out.length+' أسرة؟ الموجود مسبقاً (نفس رقم الهوية) سيتحدّث.'))addP(out,'استيراد '+out.length+' أسرة من Excel',out[0].m)}
-  else{const by={};out.forEach(p=>(by[p.m]=by[p.m]||[]).push(p));Object.keys(by).forEach(m=>{for(let i=0;i<by[m].length;i+=400){const c=by[m].slice(i,i+400);sendReq('imp',m,{rows:c,pname:c.length+' أسرة'})}})}}catch(err){toast('تعذر قراءة الملف')}};r.readAsArrayBuffer(f)};
 async function upsert(rows){const u={};rows.forEach(r=>u[r.id]=r);rows=Object.values(u);const old=await getMany(rows.filter(r=>idOk(r.id)).map(r=>r.id)),ops=[],add=[];
  rows.forEach(r=>{const o=old[r.id];if(o){const n={...o,del:false};IDK.forEach(k=>n[k]=r[k]);ops.push({p:o,n})}else{ops.push({p:null,n:r});add.push(r.id)}});
  await wr(ops);return{add,upd:ops.length-add.length}}
 async function addP(rows,txt,m){try{const r=await upsert(rows);PG={};await hist('add',txt+(r.upd?' (محدّث '+r.upd+')':''),m||rows[0].m,{add:r.add});draw()}catch(e){console.error(e);toast('تعذر الحفظ')}}
 const patchOf=(p,pt)=>{const b={};Object.keys(pt).forEach(k=>b[k]=p[k]===undefined?null:p[k]);return b};
-async function hist(kind,txt,m,extra){const h={id:uid('h'),t:Date.now(),by:ME.u,byName:ME.name,kind,txt,m:m||'',items:[],undone:false,...(extra||{})};await set('hist',h);ev(txt+(m?' – '+mname(m):''));if(isM()||kind==='nom'||kind==='prio')toastU('تم: '+txt,()=>undo(h));else toast('تم: '+txt)}
+async function hist(kind,txt,m,extra){AH={};const h={id:uid('h'),t:Date.now(),by:ME.u,byName:ME.name,kind,txt,m:m||'',items:[],undone:false,...(extra||{})};await set('hist',h);ev(txt+(m?' – '+mname(m):''));if(isM()||kind==='nom'||kind==='prio')toastU('تم: '+txt,()=>undo(h));else toast('تم: '+txt)}
 async function chg(its,kind,txt,m,extra){try{
  const ops=its.map(it=>{const pt={...it.pt};if(('name' in pt)||('wname' in pt))pt.kw=kws({...it.p,...pt});return{p:{...it.p},n:{...it.p,...pt},it,pt}});
  await wr(ops);ops.forEach(o=>{Object.assign(o.it.p,o.pt);if('del' in o.pt)Object.values(PG).forEach(P=>{if(P.rows)P.rows=P.rows.filter(r=>r.id!==o.it.p.id)})});draw();
@@ -352,6 +398,7 @@ function vSet(){
  const items=setItems();if(!items.find(x=>x[0]===sub.set))sub.set=items[0][0];const pre=subnav('set',items);
  if(sub.set==='users')vUsr(pre);
  else if(sub.set==='pw')vPw(pre);
+ else if(sub.set==='data')vData(pre);
  else if(sub.set==='trash'||sub.set==='hist')vBin(pre);
  else if(sub.set==='cfg'){
   $('#main').innerHTML=pre+`<div class="card"><h2>المساجد</h2>${CF.mosques.map(m=>`<div class="tools"><input data-r="${m.id}" value="${esc(m.name)}" style="flex:1"><span class="tag">${sd('t_'+m.id)} أسرة</span></div>`).join('')}</div>
